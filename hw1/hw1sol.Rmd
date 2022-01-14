@@ -38,9 +38,9 @@ Completion Report Link : https://www.citiprogram.org/verify/?k2eaee88d-e070-482b
 
 Completion Certificate Link: https://www.citiprogram.org/verify/?we6a0240e-a0c1-449f-901f-844f99866ced-46575325
 
-## Q3. Linux Shell Commands
+## Q3. Linux Shell Commandshttps://mimic.mit.edu/docs/iv/
 
-1. The `/mnt/mimiciv/1.0` folder on teaching server contains data sets from MIMIC-IV. Refer to the documentation <https://mimic.mit.edu/docs/iv/> for details of data files.  
+1. The `/mnt/mimiciv/1.0` folder on teaching server contains data sets from MIMIC-IV. Refer to the documentation <> for details of data files.  
     ```{bash}
     ls -l /mnt/mimiciv/1.0
     ```
@@ -50,8 +50,39 @@ Please, do **not** put these data files into Git; they are big. Do **not** copy 
 
 2. Display the contents in the folders `core`, `hosp`, `icu`. Why are these data files distributed as `.csv.gz` files instead of `.csv` (comma separated values) files? Read the page <https://mimic.mit.edu/docs/iv/> to understand what's in each folder.
 
+**Solution: **
+
+```{bash}
+ls -l /mnt/mimiciv/1.0/core
+```
+
+```{bash}
+ls -l /mnt/mimiciv/1.0/hosp
+```
+
+```{bash}
+ls -l /mnt/mimiciv/1.0/icu
+```
+
 
 3. Briefly describe what bash commands `zcat`, `zless`, `zmore`, and `zgrep` do.
+
+**Solution: **
+
+```{bash, eval=F}
+man zcat
+```
+```{bash, eval=F}
+man zless
+```
+
+```{bash, eval=F}
+man zmore
+```
+
+```{bash, eval=F}
+man zgrep
+```
 
 4. What's the output of following bash script?
     ```{bash, eval=F}
@@ -60,9 +91,33 @@ Please, do **not** put these data files into Git; they are big. Do **not** copy 
         ls -l $datafile
       done
     ```
+
 Display the number of lines in each data file using a similar loop.
 
+**Solution: **
+The above bash script lists the files in the core folder which are in gz file 
+format. 
+
+```{bash}
+for datafile in /mnt/mimiciv/1.0/core/*.gz
+  do 
+    awk 'END {print NR}' $datafile
+  done
+```
+
 5. Display the first few lines of `admissions.csv.gz`. How many rows are in this data file? How many unique patients (identified by `subject_id`) are in this data file? (Hint: combine Linux commands `zcat`, `head`/`tail`, `awk`, `sort`, `uniq`, `wc`, and so on.)
+
+**Solution: **
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | head -5
+```
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk 'END {print NR}' 
+``` 
+```{bash}
+#Get help for question 5#
+```
+
 
 6. What are the possible values taken by each of the variable `admission_type`, `admission_location`, `insurance`, and `ethnicity`? Also report the count for each unique value of these variables. (Hint: combine Linux commands `zcat`, `head`/`tail`, `awk`, `uniq -c`, `wc`, and so on.)
 
