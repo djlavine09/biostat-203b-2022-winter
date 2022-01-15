@@ -115,12 +115,48 @@ zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | head -5
 zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk 'END {print NR}' 
 ``` 
 ```{bash}
-#Get help for question 5#
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk -F, '{print $1}' | sort | uniq| awk 'END {print NR}'
+```
+There are 523741 total rows in this data file, and there are 356879 unique patients. 
+
+6. What are the possible values taken by each of the variable `admission_type`, `admission_location`, `insurance`, and `ethnicity`? Also report the count for each unique value of these variables. (Hint: combine Linux commands `zcat`, `head`/`tail`, `awk`, `uniq -c`, `wc`, and so on.)
+**Solution: **
+Show the possible values of `admission_type`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $6}' |sort |uniq
+``` 
+Print the number of unique values of `admission_type`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $6}' |sort |uniq | awk 'END {print NR}'
 ```
 
 
-6. What are the possible values taken by each of the variable `admission_type`, `admission_location`, `insurance`, and `ethnicity`? Also report the count for each unique value of these variables. (Hint: combine Linux commands `zcat`, `head`/`tail`, `awk`, `uniq -c`, `wc`, and so on.)
+Show the possible values of `admission_location`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $7}' |sort |uniq
+``` 
+Print the number of unique values of `admission_location`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $7}' |sort |uniq | awk 'END {print NR}'
+```
 
+
+Show the possible values of `insurance`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $9}' |sort |uniq
+``` 
+Print the number of unique values of `insurance`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $9}' |sort |uniq | awk 'END {print NR}'
+```
+Show the possible values of `ethnicity`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $12}' |sort |uniq
+``` 
+Print the number of unique values of `admission_type`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $12}' |sort |uniq | awk 'END {print NR}'
+```
 ## Q4. Who's popular in Price and Prejudice
 
 1. You and your friend just have finished reading *Pride and Prejudice* by Jane Austen. Among the four main characters in the book, Elizabeth, Jane, Lydia, and Darcy, your friend thinks that Darcy was the most mentioned. You, however, are certain it was Elizabeth. Obtain the full text of the novel from <http://www.gutenberg.org/cache/epub/42671/pg42671.txt> and save to your local folder. 
