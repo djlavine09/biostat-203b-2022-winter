@@ -164,14 +164,23 @@ zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $12}' |sort |uni
     wget -nc http://www.gutenberg.org/cache/epub/42671/pg42671.txt
     ```
 Explain what `wget -nc` does. Do **not** put this text file `pg42671.txt` in Git. Complete the following loop to tabulate the number of times each of the four characters is mentioned using Linux commands.
+
+**Solution: **
+
+
+`wget` follows the link provided and creates a copy of the content on the website. 
+The `-nc` option ensures that if the file is downloaded several times, that the file is overwritten. 
+
+
     ```{bash, eval=FALSE}
     wget -nc http://www.gutenberg.org/cache/epub/42671/pg42671.txt
     for char in Elizabeth Jane Lydia Darcy
     do
       echo $char:
-      # some commands here
+     grep $char pg42671.txt| wc -l
     done
     ```
+
 
 2. What's the difference between the following two commands?
     ```{bash eval=FALSE}
@@ -181,6 +190,10 @@ Explain what `wget -nc` does. Do **not** put this text file `pg42671.txt` in Git
     ```{bash eval=FALSE}
     echo 'hello, world' >> test2.txt
     ```
+
+**Solution: **
+`>` creates a new text document containing the words "hello, world", whereas
+`>>` creates a blank text document, and adds the words "hello, world". 
 
 3. Using your favorite text editor (e.g., `vi`), type the following and save the file as `middle.sh`:
     ```{bash eval=FALSE}

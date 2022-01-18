@@ -280,7 +280,7 @@ pre code {
 ## 17817079,24709883,2165-12-27 17:33:00,2165-12-31 21:18:00,,ELECTIVE,,HOME,Other,ENGLISH,,OTHER,,,0</code></pre>
 <pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk &#39;END {print NR}&#39; </code></pre>
 <pre><code>## 523741</code></pre>
-<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | sort | awk -F, &#39;{print $1}&#39; | uniq| awk &#39;END {print NR}&#39;</code></pre>
+<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk -F, &#39;{print $1}&#39; | sort | uniq| awk &#39;END {print NR}&#39;</code></pre>
 <pre><code>## 256879</code></pre>
 <p>There are 523741 total rows in this data file, and there are 356879 unique patients.</p>
 <ol start="6" style="list-style-type: decimal">
@@ -347,17 +347,26 @@ pre code {
 <ol style="list-style-type: decimal">
 <li><p>You and your friend just have finished reading <em>Pride and Prejudice</em> by Jane Austen. Among the four main characters in the book, Elizabeth, Jane, Lydia, and Darcy, your friend thinks that Darcy was the most mentioned. You, however, are certain it was Elizabeth. Obtain the full text of the novel from <a href="http://www.gutenberg.org/cache/epub/42671/pg42671.txt" class="uri">http://www.gutenberg.org/cache/epub/42671/pg42671.txt</a> and save to your local folder.</p>
 <pre class="bash"><code>wget -nc http://www.gutenberg.org/cache/epub/42671/pg42671.txt</code></pre>
-<p>Explain what <code>wget -nc</code> does. Do <strong>not</strong> put this text file <code>pg42671.txt</code> in Git. Complete the following loop to tabulate the number of times each of the four characters is mentioned using Linux commands.</p>
-<pre class="bash"><code>wget -nc http://www.gutenberg.org/cache/epub/42671/pg42671.txt
+<p>Explain what <code>wget -nc</code> does. Do <strong>not</strong> put this text file <code>pg42671.txt</code> in Git. Complete the following loop to tabulate the number of times each of the four characters is mentioned using Linux commands.</p></li>
+</ol>
+<p><strong>Solution: </strong></p>
+<p><code>wget</code> follows the link provided and creates a copy of the content on the website. The <code>-nc</code> option ensures that if the file is downloaded several times, that the file is overwritten.</p>
+<pre><code>```bash
+wget -nc http://www.gutenberg.org/cache/epub/42671/pg42671.txt
 for char in Elizabeth Jane Lydia Darcy
 do
   echo $char:
-  # some commands here
-done</code></pre></li>
+ grep $char pg42671.txt| wc -l
+done
+```</code></pre>
+<ol start="2" style="list-style-type: decimal">
 <li><p>What’s the difference between the following two commands?</p>
 <pre class="bash"><code>echo &#39;hello, world&#39; &gt; test1.txt</code></pre>
 <p>and</p>
 <pre class="bash"><code>echo &#39;hello, world&#39; &gt;&gt; test2.txt</code></pre></li>
+</ol>
+<p><strong>Solution: </strong> <code>&gt;</code> creates a new text document containing the words “hello, world”, whereas <code>&gt;&gt;</code> creates a blank text document, and adds the words “hello, world”.</p>
+<ol start="3" style="list-style-type: decimal">
 <li><p>Using your favorite text editor (e.g., <code>vi</code>), type the following and save the file as <code>middle.sh</code>:</p>
 <pre class="bash"><code>#!/bin/sh
 # Select lines from the middle of a file.
