@@ -372,11 +372,16 @@ done
 <pre class="bash"><code>#!/bin/sh
 # Select lines from the middle of a file.
 # Usage: bash middle.sh filename end_line num_lines
-head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
-<p>Using <code>chmod</code> make the file executable by the owner, and run</p>
-<pre class="bash"><code>./middle.sh pg42671.txt 20 5</code></pre>
-<p>Explain the output. Explain the meaning of <code>&quot;$1&quot;</code>, <code>&quot;$2&quot;</code>, and <code>&quot;$3&quot;</code> in this shell script. Why do we need the first line of the shell script?</p></li>
+head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre></li>
 </ol>
+<p>Using <code>chmod</code> make the file executable by the owner, and run</p>
+<p>Explain the output. Explain the meaning of <code>&quot;$1&quot;</code>, <code>&quot;$2&quot;</code>, and <code>&quot;$3&quot;</code> in this shell script. Why do we need the first line of the shell script?</p>
+<p><strong>Solution: </strong></p>
+<pre class="bash"><code>chmod u+x ./middle.sh</code></pre>
+<pre><code>```bash
+./middle.sh ~/biostat-203b-2022-winter/pg42671.txt 20 5
+```</code></pre>
+<p>The output of this bash command returns 5 lines of the text file ending at line 20. The symbols <code>&quot;$1&quot;</code>, <code>&quot;$2&quot;</code> and <code>&quot;$3&quot;</code> indicate where to place which arguments of the function in the shell script. <code>&quot;$1&quot;</code> in this case represents <code>~/biostat-203b-2022-winter/pg42671.txt</code>, <code>&quot;$2&quot;</code> is <code>20</code> and <code>&quot;$3&quot;</code> is ‘5’.</p>
 <div id="q5.-more-fun-with-linux" class="section level3">
 <h3>Q5. More fun with Linux</h3>
 <p>Try following commands in Bash and interpret the results: <code>cal</code>, <code>cal 2021</code>, <code>cal 9 1752</code> (anything unusual?), <code>date</code>, <code>hostname</code>, <code>arch</code>, <code>uname -a</code>, <code>uptime</code>, <code>who am i</code>, <code>who</code>, <code>w</code>, <code>id</code>, <code>last | head</code>, <code>echo {con,pre}{sent,fer}{s,ed}</code>, <code>time sleep 5</code>, <code>history | tail</code>.</p>
@@ -436,7 +441,7 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
 ## 
 ## 
 ## 
-## Thu Jan 20 17:40:38 UTC 2022</code></pre>
+## Thu Jan 20 22:19:47 UTC 2022</code></pre>
 <p><code>hostname</code> gives the name of the server. <code>arch</code> prints the machine name (info from <code>man arch</code>), <code>uname -a</code> prints all system information.</p>
 <pre class="bash"><code>  hostname 
   arch
@@ -446,7 +451,7 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
 ## Linux biostat-203b-teaching-server 3.10.0-1160.49.1.el7.x86_64 #1 SMP Tue Nov 30 15:51:32 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux</code></pre>
 <p><code>uptime</code> displays how long the server has been running, the number of users currently logged in, and the load averages for three time periods.</p>
 <pre class="bash"><code>uptime</code></pre>
-<pre><code>##  17:40:38 up 17 days, 17:14,  3 users,  load average: 0.22, 0.06, 0.06</code></pre>
+<pre><code>##  22:19:47 up 17 days, 21:53,  3 users,  load average: 0.77, 0.46, 0.28</code></pre>
 <p><code>whoami</code> displays my user name.</p>
 <pre class="bash"><code>whoami</code></pre>
 <pre><code>## djlavine</code></pre>
@@ -457,11 +462,11 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
 ## maschepps pts/6        2022-01-17 19:33 (74.213.228.243)</code></pre>
 <p>From <code>man w</code>: the <code>w</code> command shows how many people are logged on, how long it’s been running, and the load averages for three time periods. This command also outputs the username, login time, the time used by the user for each user.</p>
 <pre class="bash"><code>w</code></pre>
-<pre><code>##  17:40:38 up 17 days, 17:14,  3 users,  load average: 0.22, 0.06, 0.06
+<pre><code>##  22:19:47 up 17 days, 21:53,  3 users,  load average: 0.77, 0.46, 0.28
 ## USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
 ## tomokiok pts/1    42.166.94.34.bc. 11Jan22  9days  0.01s  0.01s -bash
-## tomokiok pts/3    42.166.94.34.bc. 10Jan22  9days  1.08s  0.90s ssh -i /home/tomokiokuno0528/.ssh/id_rsa tomokiokuno0528@server.ucla-biostat-203b.com
-## maschepp pts/6    74.213.228.243   Mon19    2days  0.03s  0.03s -bash</code></pre>
+## tomokiok pts/3    42.166.94.34.bc. 10Jan22  9days  1.10s  0.92s ssh -i /home/tomokiokuno0528/.ssh/id_rsa tomokiokuno0528@server.ucla-biostat-203b.com
+## maschepp pts/6    74.213.228.243   Mon19    3days  0.03s  0.03s -bash</code></pre>
 <p><code>id</code> prints the user id and group id for the user.</p>
 <pre class="bash"><code>id</code></pre>
 <pre><code>## uid=1019(djlavine) gid=1021(djlavine) groups=1021(djlavine) context=system_u:system_r:initrc_t:s0</code></pre>

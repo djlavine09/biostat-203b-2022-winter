@@ -213,11 +213,24 @@ The `-nc` option ensures that if the file is downloaded several times, that the 
     # Usage: bash middle.sh filename end_line num_lines
     head -n "$2" "$1" | tail -n "$3"
     ```
+    
+    
 Using `chmod` make the file executable by the owner, and run 
-    ```{bash eval=FALSE}
-    ./middle.sh pg42671.txt 20 5
-    ```
+
+
 Explain the output. Explain the meaning of `"$1"`, `"$2"`, and `"$3"` in this shell script. Why do we need the first line of the shell script?
+
+**Solution: **
+```{bash}
+chmod u+x ./middle.sh
+```
+
+    ```{bash eval=FALSE}
+    ./middle.sh ~/biostat-203b-2022-winter/pg42671.txt 20 5
+    ```
+The output of this bash command returns 5 lines of the text file ending at line 20. 
+The symbols `"$1"`, `"$2"` and `"$3"` indicate where to place which arguments of the function in the shell script. `"$1"` in this case represents `~/biostat-203b-2022-winter/pg42671.txt`, `"$2"` is `20` and `"$3"` is '5'. 
+
 
 ### Q5. More fun with Linux
 
