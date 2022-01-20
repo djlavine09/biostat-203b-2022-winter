@@ -51,7 +51,10 @@ Please, do **not** put these data files into Git; they are big. Do **not** copy 
 2. Display the contents in the folders `core`, `hosp`, `icu`. Why are these data files distributed as `.csv.gz` files instead of `.csv` (comma separated values) files? Read the page <https://mimic.mit.edu/docs/iv/> to understand what's in each folder.
 
 **Solution: **
-
+These data files are distributed as `.csv.gz` files instead of `.csv` files because
+they are compressed into a smaller file size, and will take up less room wherever 
+those files are stored. The following lines of code display the contents in the folders
+`core`, `hosp`, and `icu`:
 ```{bash}
 ls -l /mnt/mimiciv/1.0/core
 ```
@@ -68,6 +71,10 @@ ls -l /mnt/mimiciv/1.0/icu
 3. Briefly describe what bash commands `zcat`, `zless`, `zmore`, and `zgrep` do.
 
 **Solution: **
+`zcat` uncompressed compressed files, such as those in part 2. `zless` and `zmore`
+are the anologs to the `less` and `more` functions, but work for compressed files. 
+`zless` and `zmore` allow users to read text files a page at a time. `zgrep` allows 
+users to use `grep` on compressed files. Information was obtained by the following: 
 
 ```{bash, eval=F}
 man zcat
@@ -84,6 +91,8 @@ man zmore
 man zgrep
 ```
 
+
+
 4. What's the output of following bash script?
     ```{bash, eval=F}
     for datafile in /mnt/mimiciv/1.0/core/*.gz
@@ -96,7 +105,7 @@ Display the number of lines in each data file using a similar loop.
 
 **Solution: **
 The above bash script lists the files in the core folder which are in gz file 
-format. 
+format. The following displays the number of lines in each data file:
 
 ```{bash}
 for datafile in /mnt/mimiciv/1.0/core/*.gz
@@ -120,6 +129,8 @@ zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk -F, '{print $1}' | sort | uni
 There are 523741 total rows in this data file, and there are 356879 unique patients. 
 
 6. What are the possible values taken by each of the variable `admission_type`, `admission_location`, `insurance`, and `ethnicity`? Also report the count for each unique value of these variables. (Hint: combine Linux commands `zcat`, `head`/`tail`, `awk`, `uniq -c`, `wc`, and so on.)
+
+
 **Solution: **
 Show the possible values of `admission_type`
 ```{bash}
@@ -218,36 +229,57 @@ The `cal` command outputs the calendar for the current month. `cal 2021` outputs
 the entire 12-month calendar for 2021. `cal 9 1752` outputs the calendar for September
 1752, however it appears that it omits dates between September 2 and September 14. 
 `date` gives the current day of the week, calendar day, time and year. 
+
 ```{bash}
-cal
-cal 2021
-cal 9 1752
-date
+  cal
+  cal 2021
+  cal 9 1752
+  date
 ```
 
 `hostname` gives the name of the server. `arch` prints the machine name (info from `man arch`), `uname -a` prints all system information. 
-```{bash}
 
-hostname 
-arch
-uname -a
+```{bash}
+  hostname 
+  arch
+  uname -a
 ```
 
+`uptime` displays how long the server has been running, the number of users currently
+logged in, and the load averages for three time periods. 
+```{bash}
+uptime
+```
+`whoami` displays my user name. 
+```{bash}
+whoami
+```
+`who` shows who is currently logged onto the server. 
 ```{bash}
 who
-w
-id
-last | head
 ```
-
+From `man w`: the `w` command shows how many people are logged on, how long it's been running, and the load averages for three time periods. This command also outputs the username, login time, the time used by the user for each user. 
+```{bash}
+w
+```
+`id` prints the user id and group id for the user. 
+```{bash}
+id
+```
+The command `last | head` lists the last 10 users who logged into the server. 
+```{bash}
+last | head 
+```
+The command `echo {con,pre}{sent,fer}{s,ed}` concatenates each combination of the two
+prefixes and suffixes listed in the three braces, in order of how they are listed. 
 ```{bash}
 echo {con,pre}{sent,fer}{s,ed}
 ```
-
+The command `time sleep 5` makes the computer pause for 5 seconds. 
 ```{bash}
 time sleep 5
 ```
-
+ `history | tail` displays the last 10 lines of the command history. 
 ```{bash}
 history | tail
 ```

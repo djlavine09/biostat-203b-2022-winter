@@ -207,7 +207,7 @@ pre code {
 <p>Use Bash commands to answer following questions.</p></li>
 <li><p>Display the contents in the folders <code>core</code>, <code>hosp</code>, <code>icu</code>. Why are these data files distributed as <code>.csv.gz</code> files instead of <code>.csv</code> (comma separated values) files? Read the page <a href="https://mimic.mit.edu/docs/iv/" class="uri">https://mimic.mit.edu/docs/iv/</a> to understand what’s in each folder.</p></li>
 </ol>
-<p><strong>Solution: </strong></p>
+<p><strong>Solution: </strong> These data files are distributed as <code>.csv.gz</code> files instead of <code>.csv</code> files because they are compressed into a smaller file size, and will take up less room wherever those files are stored. The following lines of code display the contents in the folders <code>core</code>, <code>hosp</code>, and <code>icu</code>:</p>
 <pre class="bash"><code>ls -l /mnt/mimiciv/1.0/core</code></pre>
 <pre><code>## total 71472
 ## -rw-r--r--. 1 root root 17208966 Jan  4 21:48 admissions.csv.gz
@@ -247,7 +247,7 @@ pre code {
 <ol start="3" style="list-style-type: decimal">
 <li>Briefly describe what bash commands <code>zcat</code>, <code>zless</code>, <code>zmore</code>, and <code>zgrep</code> do.</li>
 </ol>
-<p><strong>Solution: </strong></p>
+<p><strong>Solution: </strong> <code>zcat</code> uncompressed compressed files, such as those in part 2. <code>zless</code> and <code>zmore</code> are the anologs to the <code>less</code> and <code>more</code> functions, but work for compressed files. <code>zless</code> and <code>zmore</code> allow users to read text files a page at a time. <code>zgrep</code> allows users to use <code>grep</code> on compressed files. Information was obtained by the following:</p>
 <pre class="bash"><code>man zcat</code></pre>
 <pre class="bash"><code>man zless</code></pre>
 <pre class="bash"><code>man zmore</code></pre>
@@ -260,7 +260,7 @@ pre code {
   done</code></pre></li>
 </ol>
 <p>Display the number of lines in each data file using a similar loop.</p>
-<p><strong>Solution: </strong> The above bash script lists the files in the core folder which are in gz file format.</p>
+<p><strong>Solution: </strong> The above bash script lists the files in the core folder which are in gz file format. The following displays the number of lines in each data file:</p>
 <pre class="bash"><code>for datafile in /mnt/mimiciv/1.0/core/*.gz
   do 
     awk &#39;END {print NR}&#39; $datafile
@@ -284,8 +284,9 @@ pre code {
 <pre><code>## 256879</code></pre>
 <p>There are 523741 total rows in this data file, and there are 356879 unique patients.</p>
 <ol start="6" style="list-style-type: decimal">
-<li>What are the possible values taken by each of the variable <code>admission_type</code>, <code>admission_location</code>, <code>insurance</code>, and <code>ethnicity</code>? Also report the count for each unique value of these variables. (Hint: combine Linux commands <code>zcat</code>, <code>head</code>/<code>tail</code>, <code>awk</code>, <code>uniq -c</code>, <code>wc</code>, and so on.) <strong>Solution: </strong> Show the possible values of <code>admission_type</code></li>
+<li>What are the possible values taken by each of the variable <code>admission_type</code>, <code>admission_location</code>, <code>insurance</code>, and <code>ethnicity</code>? Also report the count for each unique value of these variables. (Hint: combine Linux commands <code>zcat</code>, <code>head</code>/<code>tail</code>, <code>awk</code>, <code>uniq -c</code>, <code>wc</code>, and so on.)</li>
 </ol>
+<p><strong>Solution: </strong> Show the possible values of <code>admission_type</code></p>
 <pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $6}&#39; |sort |uniq</code></pre>
 <pre><code>## admission_type
 ## AMBULATORY OBSERVATION
@@ -379,6 +380,114 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
 <div id="q5.-more-fun-with-linux" class="section level3">
 <h3>Q5. More fun with Linux</h3>
 <p>Try following commands in Bash and interpret the results: <code>cal</code>, <code>cal 2021</code>, <code>cal 9 1752</code> (anything unusual?), <code>date</code>, <code>hostname</code>, <code>arch</code>, <code>uname -a</code>, <code>uptime</code>, <code>who am i</code>, <code>who</code>, <code>w</code>, <code>id</code>, <code>last | head</code>, <code>echo {con,pre}{sent,fer}{s,ed}</code>, <code>time sleep 5</code>, <code>history | tail</code>.</p>
+<p><strong>Solution: </strong> The <code>cal</code> command outputs the calendar for the current month. <code>cal 2021</code> outputs the entire 12-month calendar for 2021. <code>cal 9 1752</code> outputs the calendar for September 1752, however it appears that it omits dates between September 2 and September 14. <code>date</code> gives the current day of the week, calendar day, time and year.</p>
+<pre class="bash"><code>  cal
+  cal 2021
+  cal 9 1752
+  date</code></pre>
+<pre><code>##     January 2022    
+## Su Mo Tu We Th Fr Sa
+##                    1
+##  2  3  4  5  6  7  8
+##  9 10 11 12 13 14 15
+## 16 17 18 19 20 21 22
+## 23 24 25 26 27 28 29
+## 30 31
+##                                2021                               
+## 
+##        January               February                 March       
+## Su Mo Tu We Th Fr Sa   Su Mo Tu We Th Fr Sa   Su Mo Tu We Th Fr Sa
+##                 1  2       1  2  3  4  5  6       1  2  3  4  5  6
+##  3  4  5  6  7  8  9    7  8  9 10 11 12 13    7  8  9 10 11 12 13
+## 10 11 12 13 14 15 16   14 15 16 17 18 19 20   14 15 16 17 18 19 20
+## 17 18 19 20 21 22 23   21 22 23 24 25 26 27   21 22 23 24 25 26 27
+## 24 25 26 27 28 29 30   28                     28 29 30 31
+## 31
+##         April                   May                   June        
+## Su Mo Tu We Th Fr Sa   Su Mo Tu We Th Fr Sa   Su Mo Tu We Th Fr Sa
+##              1  2  3                      1          1  2  3  4  5
+##  4  5  6  7  8  9 10    2  3  4  5  6  7  8    6  7  8  9 10 11 12
+## 11 12 13 14 15 16 17    9 10 11 12 13 14 15   13 14 15 16 17 18 19
+## 18 19 20 21 22 23 24   16 17 18 19 20 21 22   20 21 22 23 24 25 26
+## 25 26 27 28 29 30      23 24 25 26 27 28 29   27 28 29 30
+##                        30 31
+##         July                  August                September     
+## Su Mo Tu We Th Fr Sa   Su Mo Tu We Th Fr Sa   Su Mo Tu We Th Fr Sa
+##              1  2  3    1  2  3  4  5  6  7             1  2  3  4
+##  4  5  6  7  8  9 10    8  9 10 11 12 13 14    5  6  7  8  9 10 11
+## 11 12 13 14 15 16 17   15 16 17 18 19 20 21   12 13 14 15 16 17 18
+## 18 19 20 21 22 23 24   22 23 24 25 26 27 28   19 20 21 22 23 24 25
+## 25 26 27 28 29 30 31   29 30 31               26 27 28 29 30
+## 
+##        October               November               December      
+## Su Mo Tu We Th Fr Sa   Su Mo Tu We Th Fr Sa   Su Mo Tu We Th Fr Sa
+##                 1  2       1  2  3  4  5  6             1  2  3  4
+##  3  4  5  6  7  8  9    7  8  9 10 11 12 13    5  6  7  8  9 10 11
+## 10 11 12 13 14 15 16   14 15 16 17 18 19 20   12 13 14 15 16 17 18
+## 17 18 19 20 21 22 23   21 22 23 24 25 26 27   19 20 21 22 23 24 25
+## 24 25 26 27 28 29 30   28 29 30               26 27 28 29 30 31
+## 31
+## 
+##    September 1752   
+## Su Mo Tu We Th Fr Sa
+##        1  2 14 15 16
+## 17 18 19 20 21 22 23
+## 24 25 26 27 28 29 30
+## 
+## 
+## 
+## Thu Jan 20 17:40:38 UTC 2022</code></pre>
+<p><code>hostname</code> gives the name of the server. <code>arch</code> prints the machine name (info from <code>man arch</code>), <code>uname -a</code> prints all system information.</p>
+<pre class="bash"><code>  hostname 
+  arch
+  uname -a</code></pre>
+<pre><code>## biostat-203b-teaching-server
+## x86_64
+## Linux biostat-203b-teaching-server 3.10.0-1160.49.1.el7.x86_64 #1 SMP Tue Nov 30 15:51:32 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux</code></pre>
+<p><code>uptime</code> displays how long the server has been running, the number of users currently logged in, and the load averages for three time periods.</p>
+<pre class="bash"><code>uptime</code></pre>
+<pre><code>##  17:40:38 up 17 days, 17:14,  3 users,  load average: 0.22, 0.06, 0.06</code></pre>
+<p><code>whoami</code> displays my user name.</p>
+<pre class="bash"><code>whoami</code></pre>
+<pre><code>## djlavine</code></pre>
+<p><code>who</code> shows who is currently logged onto the server.</p>
+<pre class="bash"><code>who</code></pre>
+<pre><code>## tomokiokuno0528 pts/1        2022-01-11 01:13 (42.166.94.34.bc.googleusercontent.com)
+## tomokiokuno0528 pts/3        2022-01-10 23:43 (42.166.94.34.bc.googleusercontent.com)
+## maschepps pts/6        2022-01-17 19:33 (74.213.228.243)</code></pre>
+<p>From <code>man w</code>: the <code>w</code> command shows how many people are logged on, how long it’s been running, and the load averages for three time periods. This command also outputs the username, login time, the time used by the user for each user.</p>
+<pre class="bash"><code>w</code></pre>
+<pre><code>##  17:40:38 up 17 days, 17:14,  3 users,  load average: 0.22, 0.06, 0.06
+## USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+## tomokiok pts/1    42.166.94.34.bc. 11Jan22  9days  0.01s  0.01s -bash
+## tomokiok pts/3    42.166.94.34.bc. 10Jan22  9days  1.08s  0.90s ssh -i /home/tomokiokuno0528/.ssh/id_rsa tomokiokuno0528@server.ucla-biostat-203b.com
+## maschepp pts/6    74.213.228.243   Mon19    2days  0.03s  0.03s -bash</code></pre>
+<p><code>id</code> prints the user id and group id for the user.</p>
+<pre class="bash"><code>id</code></pre>
+<pre><code>## uid=1019(djlavine) gid=1021(djlavine) groups=1021(djlavine) context=system_u:system_r:initrc_t:s0</code></pre>
+<p>The command <code>last | head</code> lists the last 10 users who logged into the server.</p>
+<pre class="bash"><code>last | head </code></pre>
+<pre><code>## blei001  pts/7        cpe-76-171-0-146 Thu Jan 20 06:38 - 06:41  (00:02)    
+## jiahaoti pts/14       104-54-32-28.lig Thu Jan 20 02:14 - 04:59  (02:44)    
+## huazhou  pts/30       149.142.103.91   Wed Jan 19 02:23 - 02:32  (00:09)    
+## lillyhua pts/20       64.201.127.119   Wed Jan 19 01:13 - 03:56  (02:43)    
+## lillyhua pts/20       64.201.127.119   Wed Jan 19 01:10 - 01:12  (00:01)    
+## lillyhua pts/20       64.201.127.119   Wed Jan 19 00:24 - 01:10  (00:46)    
+## sharonfe pts/19       38.15.211.52     Wed Jan 19 00:20 - 00:52  (00:31)    
+## yuyuanli pts/18       149.142.103.176  Wed Jan 19 00:20 - 02:01  (01:41)    
+## inclassd pts/17       149.142.103.176  Wed Jan 19 00:20 - 02:32  (02:11)    
+## jiahaoti pts/16       104-54-32-28.lig Wed Jan 19 00:20 - 02:00  (01:40)</code></pre>
+<p>The command <code>echo {con,pre}{sent,fer}{s,ed}</code> concatenates each combination of the two prefixes and suffixes listed in the three braces, in order of how they are listed.</p>
+<pre class="bash"><code>echo {con,pre}{sent,fer}{s,ed}</code></pre>
+<pre><code>## consents consented confers confered presents presented prefers prefered</code></pre>
+<p>The command <code>time sleep 5</code> makes the computer pause for 5 seconds.</p>
+<pre class="bash"><code>time sleep 5</code></pre>
+<pre><code>## 
+## real 0m5.001s
+## user 0m0.000s
+## sys  0m0.001s</code></pre>
+<p><code>history | tail</code> displays the last 10 lines of the command history.</p>
+<pre class="bash"><code>history | tail</code></pre>
 </div>
 </div>
 
