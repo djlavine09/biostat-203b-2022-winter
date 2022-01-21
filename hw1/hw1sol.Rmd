@@ -38,9 +38,9 @@ Completion Report Link : https://www.citiprogram.org/verify/?k2eaee88d-e070-482b
 
 Completion Certificate Link: https://www.citiprogram.org/verify/?we6a0240e-a0c1-449f-901f-844f99866ced-46575325
 
-## Q3. Linux Shell Commands
+## Q3. Linux Shell Commandshttps://mimic.mit.edu/docs/iv/
 
-1. The `/mnt/mimiciv/1.0` folder on teaching server contains data sets from MIMIC-IV. Refer to the documentation <https://mimic.mit.edu/docs/iv/> for details of data files.  
+1. The `/mnt/mimiciv/1.0` folder on teaching server contains data sets from MIMIC-IV. Refer to the documentation <> for details of data files.  
     ```{bash}
     ls -l /mnt/mimiciv/1.0
     ```
@@ -50,8 +50,48 @@ Please, do **not** put these data files into Git; they are big. Do **not** copy 
 
 2. Display the contents in the folders `core`, `hosp`, `icu`. Why are these data files distributed as `.csv.gz` files instead of `.csv` (comma separated values) files? Read the page <https://mimic.mit.edu/docs/iv/> to understand what's in each folder.
 
+**Solution: **
+These data files are distributed as `.csv.gz` files instead of `.csv` files because
+they are compressed into a smaller file size, and will take up less room wherever 
+those files are stored. The following lines of code display the contents in the folders
+`core`, `hosp`, and `icu`:
+```{bash}
+ls -l /mnt/mimiciv/1.0/core
+```
+
+```{bash}
+ls -l /mnt/mimiciv/1.0/hosp
+```
+
+```{bash}
+ls -l /mnt/mimiciv/1.0/icu
+```
+
 
 3. Briefly describe what bash commands `zcat`, `zless`, `zmore`, and `zgrep` do.
+
+**Solution: **
+`zcat` uncompressed compressed files, such as those in part 2. `zless` and `zmore`
+are the anologs to the `less` and `more` functions, but work for compressed files. 
+`zless` and `zmore` allow users to read text files a page at a time. `zgrep` allows 
+users to use `grep` on compressed files. Information was obtained by the following: 
+
+```{bash, eval=F}
+man zcat
+```
+```{bash, eval=F}
+man zless
+```
+
+```{bash, eval=F}
+man zmore
+```
+
+```{bash, eval=F}
+man zgrep
+```
+
+
 
 4. What's the output of following bash script?
     ```{bash, eval=F}
@@ -60,12 +100,80 @@ Please, do **not** put these data files into Git; they are big. Do **not** copy 
         ls -l $datafile
       done
     ```
+
 Display the number of lines in each data file using a similar loop.
+
+**Solution: **
+The above bash script lists the files in the core folder which are in gz file 
+format. The following displays the number of lines in each data file:
+
+```{bash}
+for datafile in /mnt/mimiciv/1.0/core/*.gz
+  do 
+    awk 'END {print NR}' $datafile
+  done
+```
 
 5. Display the first few lines of `admissions.csv.gz`. How many rows are in this data file? How many unique patients (identified by `subject_id`) are in this data file? (Hint: combine Linux commands `zcat`, `head`/`tail`, `awk`, `sort`, `uniq`, `wc`, and so on.)
 
+**Solution: **
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | head -5
+```
+
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk 'END {print NR}' 
+``` 
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk -F, '{print $1}' | sort | uniq|
+awk 'END {print NR}'
+```
+There are 523741 total rows in this data file, and there are 356879 unique patients. 
+
 6. What are the possible values taken by each of the variable `admission_type`, `admission_location`, `insurance`, and `ethnicity`? Also report the count for each unique value of these variables. (Hint: combine Linux commands `zcat`, `head`/`tail`, `awk`, `uniq -c`, `wc`, and so on.)
 
+
+**Solution: **
+Show the possible values of `admission_type`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $6}' |sort |uniq
+``` 
+Print the number of unique values of `admission_type`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $6}' |sort |uniq|
+awk 'END {print NR}'
+```
+
+
+Show the possible values of `admission_location`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $7}' |sort |uniq
+``` 
+Print the number of unique values of `admission_location`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $7}' |sort |uniq | 
+awk 'END {print NR}'
+```
+
+
+Show the possible values of `insurance`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $9}' |sort |uniq
+``` 
+Print the number of unique values of `insurance`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $9}' |sort |uniq | 
+awk 'END {print NR}'
+```
+Show the possible values of `ethnicity`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $12}' |sort |uniq
+``` 
+Print the number of unique values of `admission_type`
+```{bash}
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $12}' |sort |
+uniq | awk 'END {print NR}'
+```
 ## Q4. Who's popular in Price and Prejudice
 
 1. You and your friend just have finished reading *Pride and Prejudice* by Jane Austen. Among the four main characters in the book, Elizabeth, Jane, Lydia, and Darcy, your friend thinks that Darcy was the most mentioned. You, however, are certain it was Elizabeth. Obtain the full text of the novel from <http://www.gutenberg.org/cache/epub/42671/pg42671.txt> and save to your local folder. 
@@ -73,14 +181,23 @@ Display the number of lines in each data file using a similar loop.
     wget -nc http://www.gutenberg.org/cache/epub/42671/pg42671.txt
     ```
 Explain what `wget -nc` does. Do **not** put this text file `pg42671.txt` in Git. Complete the following loop to tabulate the number of times each of the four characters is mentioned using Linux commands.
+
+**Solution: **
+
+
+`wget` follows the link provided and creates a copy of the content on the website. 
+The `-nc` option ensures that if the file is downloaded several times, that the file is overwritten. 
+
+
     ```{bash, eval=FALSE}
     wget -nc http://www.gutenberg.org/cache/epub/42671/pg42671.txt
     for char in Elizabeth Jane Lydia Darcy
     do
       echo $char:
-      # some commands here
+     grep $char pg42671.txt| wc -l
     done
     ```
+
 
 2. What's the difference between the following two commands?
     ```{bash eval=FALSE}
@@ -91,6 +208,10 @@ Explain what `wget -nc` does. Do **not** put this text file `pg42671.txt` in Git
     echo 'hello, world' >> test2.txt
     ```
 
+**Solution: **
+`>` creates a new text document containing the words "hello, world", whereas
+`>>` creates a blank text document, and adds the words "hello, world". 
+
 3. Using your favorite text editor (e.g., `vi`), type the following and save the file as `middle.sh`:
     ```{bash eval=FALSE}
     #!/bin/sh
@@ -98,12 +219,86 @@ Explain what `wget -nc` does. Do **not** put this text file `pg42671.txt` in Git
     # Usage: bash middle.sh filename end_line num_lines
     head -n "$2" "$1" | tail -n "$3"
     ```
+    
+    
 Using `chmod` make the file executable by the owner, and run 
-    ```{bash eval=FALSE}
-    ./middle.sh pg42671.txt 20 5
-    ```
+
+
 Explain the output. Explain the meaning of `"$1"`, `"$2"`, and `"$3"` in this shell script. Why do we need the first line of the shell script?
+
+**Solution: **
+```{bash}
+chmod u+x ./middle.sh
+```
+
+    ```{bash eval=FALSE}
+    ./middle.sh ~/biostat-203b-2022-winter/pg42671.txt 20 5
+    ```
+The output of this bash command returns 5 lines of the text file ending at line 20. 
+The symbols `"$1"`, `"$2"` and `"$3"` indicate where to place which arguments of the function in the shell script. `"$1"` in this case represents `~/biostat-203b-2022-winter/pg42671.txt`, `"$2"` is `20` and `"$3"` is '5'. 
+
 
 ### Q5. More fun with Linux
 
 Try following commands in Bash and interpret the results: `cal`, `cal 2021`, `cal 9 1752` (anything unusual?), `date`, `hostname`, `arch`, `uname -a`, `uptime`, `who am i`, `who`, `w`, `id`, `last | head`, `echo {con,pre}{sent,fer}{s,ed}`, `time sleep 5`, `history | tail`.
+
+
+**Solution: **
+The `cal` command outputs the calendar for the current month. `cal 2021` outputs 
+the entire 12-month calendar for 2021. `cal 9 1752` outputs the calendar for September
+1752, however it appears that it omits dates between September 2 and September 14. 
+`date` gives the current day of the week, calendar day, time and year. 
+
+```{bash}
+  cal
+  cal 2021
+  cal 9 1752
+  date
+```
+
+`hostname` gives the name of the server. `arch` prints the machine name (info from `man arch`), `uname -a` prints all system information. 
+
+```{bash}
+  hostname 
+  arch
+  uname -a
+```
+
+`uptime` displays how long the server has been running, the number of users currently
+logged in, and the load averages for three time periods. 
+```{bash}
+uptime
+```
+`whoami` displays my user name. 
+```{bash}
+whoami
+```
+`who` shows who is currently logged onto the server. 
+```{bash}
+who
+```
+From `man w`: the `w` command shows how many people are logged on, how long it's been running, and the load averages for three time periods. This command also outputs the username, login time, the time used by the user for each user. 
+```{bash}
+w
+```
+`id` prints the user id and group id for the user. 
+```{bash}
+id
+```
+The command `last | head` lists the last 10 users who logged into the server. 
+```{bash}
+last | head 
+```
+The command `echo {con,pre}{sent,fer}{s,ed}` concatenates each combination of the two
+prefixes and suffixes listed in the three braces, in order of how they are listed. 
+```{bash}
+echo {con,pre}{sent,fer}{s,ed}
+```
+The command `time sleep 5` makes the computer pause for 5 seconds. 
+```{bash}
+time sleep 5
+```
+ `history | tail` displays the last 10 lines of the command history. 
+```{bash}
+history | tail
+```
