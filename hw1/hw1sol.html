@@ -280,7 +280,8 @@ pre code {
 ## 17817079,24709883,2165-12-27 17:33:00,2165-12-31 21:18:00,,ELECTIVE,,HOME,Other,ENGLISH,,OTHER,,,0</code></pre>
 <pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk &#39;END {print NR}&#39; </code></pre>
 <pre><code>## 523741</code></pre>
-<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk -F, &#39;{print $1}&#39; | sort | uniq| awk &#39;END {print NR}&#39;</code></pre>
+<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk -F, &#39;{print $1}&#39; | sort | uniq|
+awk &#39;END {print NR}&#39;</code></pre>
 <pre><code>## 256879</code></pre>
 <p>There are 523741 total rows in this data file, and there are 356879 unique patients.</p>
 <ol start="6" style="list-style-type: decimal">
@@ -299,7 +300,8 @@ pre code {
 ## SURGICAL SAME DAY ADMISSION
 ## URGENT</code></pre>
 <p>Print the number of unique values of <code>admission_type</code></p>
-<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $6}&#39; |sort |uniq | awk &#39;END {print NR}&#39;</code></pre>
+<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $6}&#39; |sort |uniq|
+awk &#39;END {print NR}&#39;</code></pre>
 <pre><code>## 10</code></pre>
 <p>Show the possible values of <code>admission_location</code></p>
 <pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $7}&#39; |sort |uniq</code></pre>
@@ -317,7 +319,8 @@ pre code {
 ## TRANSFER FROM SKILLED NURSING FACILITY
 ## WALK-IN/SELF REFERRAL</code></pre>
 <p>Print the number of unique values of <code>admission_location</code></p>
-<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $7}&#39; |sort |uniq | awk &#39;END {print NR}&#39;</code></pre>
+<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $7}&#39; |sort |uniq | 
+awk &#39;END {print NR}&#39;</code></pre>
 <pre><code>## 13</code></pre>
 <p>Show the possible values of <code>insurance</code></p>
 <pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $9}&#39; |sort |uniq</code></pre>
@@ -326,7 +329,8 @@ pre code {
 ## Medicare
 ## Other</code></pre>
 <p>Print the number of unique values of <code>insurance</code></p>
-<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $9}&#39; |sort |uniq | awk &#39;END {print NR}&#39;</code></pre>
+<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $9}&#39; |sort |uniq | 
+awk &#39;END {print NR}&#39;</code></pre>
 <pre><code>## 4</code></pre>
 <p>Show the possible values of <code>ethnicity</code></p>
 <pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $12}&#39; |sort |uniq</code></pre>
@@ -340,7 +344,8 @@ pre code {
 ## UNKNOWN
 ## WHITE</code></pre>
 <p>Print the number of unique values of <code>admission_type</code></p>
-<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $12}&#39; |sort |uniq | awk &#39;END {print NR}&#39;</code></pre>
+<pre class="bash"><code>zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, &#39;{print $12}&#39; |sort |
+uniq | awk &#39;END {print NR}&#39;</code></pre>
 <pre><code>## 9</code></pre>
 </div>
 <div id="q4.-whos-popular-in-price-and-prejudice" class="section level2">
@@ -441,7 +446,7 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre></li>
 ## 
 ## 
 ## 
-## Thu Jan 20 22:19:47 UTC 2022</code></pre>
+## Fri Jan 21 04:53:08 UTC 2022</code></pre>
 <p><code>hostname</code> gives the name of the server. <code>arch</code> prints the machine name (info from <code>man arch</code>), <code>uname -a</code> prints all system information.</p>
 <pre class="bash"><code>  hostname 
   arch
@@ -451,7 +456,7 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre></li>
 ## Linux biostat-203b-teaching-server 3.10.0-1160.49.1.el7.x86_64 #1 SMP Tue Nov 30 15:51:32 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux</code></pre>
 <p><code>uptime</code> displays how long the server has been running, the number of users currently logged in, and the load averages for three time periods.</p>
 <pre class="bash"><code>uptime</code></pre>
-<pre><code>##  22:19:47 up 17 days, 21:53,  3 users,  load average: 0.77, 0.46, 0.28</code></pre>
+<pre><code>##  04:53:08 up 18 days,  4:26,  4 users,  load average: 1.20, 0.52, 0.39</code></pre>
 <p><code>whoami</code> displays my user name.</p>
 <pre class="bash"><code>whoami</code></pre>
 <pre><code>## djlavine</code></pre>
@@ -459,29 +464,31 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre></li>
 <pre class="bash"><code>who</code></pre>
 <pre><code>## tomokiokuno0528 pts/1        2022-01-11 01:13 (42.166.94.34.bc.googleusercontent.com)
 ## tomokiokuno0528 pts/3        2022-01-10 23:43 (42.166.94.34.bc.googleusercontent.com)
-## maschepps pts/6        2022-01-17 19:33 (74.213.228.243)</code></pre>
+## maschepps pts/6        2022-01-17 19:33 (74.213.228.243)
+## capj245  pts/13       2022-01-21 03:54 (s-164-67-232-61.resnet.ucla.edu)</code></pre>
 <p>From <code>man w</code>: the <code>w</code> command shows how many people are logged on, how long it’s been running, and the load averages for three time periods. This command also outputs the username, login time, the time used by the user for each user.</p>
 <pre class="bash"><code>w</code></pre>
-<pre><code>##  22:19:47 up 17 days, 21:53,  3 users,  load average: 0.77, 0.46, 0.28
+<pre><code>##  04:53:08 up 18 days,  4:26,  4 users,  load average: 1.20, 0.52, 0.39
 ## USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
-## tomokiok pts/1    42.166.94.34.bc. 11Jan22  9days  0.01s  0.01s -bash
-## tomokiok pts/3    42.166.94.34.bc. 10Jan22  9days  1.10s  0.92s ssh -i /home/tomokiokuno0528/.ssh/id_rsa tomokiokuno0528@server.ucla-biostat-203b.com
-## maschepp pts/6    74.213.228.243   Mon19    3days  0.03s  0.03s -bash</code></pre>
+## tomokiok pts/1    42.166.94.34.bc. 11Jan22 10days  0.01s  0.01s -bash
+## tomokiok pts/3    42.166.94.34.bc. 10Jan22 10days  1.13s  0.95s ssh -i /home/tomokiokuno0528/.ssh/id_rsa tomokiokuno0528@server.ucla-biostat-203b.com
+## maschepp pts/6    74.213.228.243   Mon19    3days  0.03s  0.03s -bash
+## capj245  pts/13   s-164-67-232-61. 03:54   58:04   0.01s  0.01s -bash</code></pre>
 <p><code>id</code> prints the user id and group id for the user.</p>
 <pre class="bash"><code>id</code></pre>
 <pre><code>## uid=1019(djlavine) gid=1021(djlavine) groups=1021(djlavine) context=system_u:system_r:initrc_t:s0</code></pre>
 <p>The command <code>last | head</code> lists the last 10 users who logged into the server.</p>
 <pre class="bash"><code>last | head </code></pre>
-<pre><code>## blei001  pts/7        cpe-76-171-0-146 Thu Jan 20 06:38 - 06:41  (00:02)    
-## jiahaoti pts/14       104-54-32-28.lig Thu Jan 20 02:14 - 04:59  (02:44)    
-## huazhou  pts/30       149.142.103.91   Wed Jan 19 02:23 - 02:32  (00:09)    
-## lillyhua pts/20       64.201.127.119   Wed Jan 19 01:13 - 03:56  (02:43)    
-## lillyhua pts/20       64.201.127.119   Wed Jan 19 01:10 - 01:12  (00:01)    
-## lillyhua pts/20       64.201.127.119   Wed Jan 19 00:24 - 01:10  (00:46)    
-## sharonfe pts/19       38.15.211.52     Wed Jan 19 00:20 - 00:52  (00:31)    
-## yuyuanli pts/18       149.142.103.176  Wed Jan 19 00:20 - 02:01  (01:41)    
-## inclassd pts/17       149.142.103.176  Wed Jan 19 00:20 - 02:32  (02:11)    
-## jiahaoti pts/16       104-54-32-28.lig Wed Jan 19 00:20 - 02:00  (01:40)</code></pre>
+<pre><code>## tokramm  pts/18       76.82.34.63      Fri Jan 21 04:31 - 04:53  (00:21)    
+## capj245  pts/13       s-164-67-232-61. Fri Jan 21 03:54   still logged in   
+## capj245  pts/13       s-164-67-232-61. Fri Jan 21 03:45 - 03:49  (00:04)    
+## capj245  pts/13       s-164-67-232-61. Fri Jan 21 03:36 - 03:38  (00:01)    
+## yuyuanli pts/30       149.142.103.176  Fri Jan 21 01:13 - 01:14  (00:00)    
+## huazhou  pts/7        108-64-58-205.li Fri Jan 21 01:03 - 01:52  (00:48)    
+## ritazxca pts/26       42.166.94.34.bc. Fri Jan 21 00:43 - 02:16  (01:33)    
+## ritazxca pts/24       42.166.94.34.bc. Fri Jan 21 00:32 - 02:16  (01:43)    
+## ritazxca pts/23       42.166.94.34.bc. Fri Jan 21 00:31 - 02:16  (01:44)    
+## ritazxca pts/21       42.166.94.34.bc. Fri Jan 21 00:31 - 02:16  (01:44)</code></pre>
 <p>The command <code>echo {con,pre}{sent,fer}{s,ed}</code> concatenates each combination of the two prefixes and suffixes listed in the three braces, in order of how they are listed.</p>
 <pre class="bash"><code>echo {con,pre}{sent,fer}{s,ed}</code></pre>
 <pre><code>## consents consented confers confered presents presented prefers prefered</code></pre>

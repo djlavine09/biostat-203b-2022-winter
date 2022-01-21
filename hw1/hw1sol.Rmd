@@ -120,11 +120,13 @@ for datafile in /mnt/mimiciv/1.0/core/*.gz
 ```{bash}
 zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | head -5
 ```
+
 ```{bash}
 zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk 'END {print NR}' 
 ``` 
 ```{bash}
-zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk -F, '{print $1}' | sort | uniq| awk 'END {print NR}'
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz | awk -F, '{print $1}' | sort | uniq|
+awk 'END {print NR}'
 ```
 There are 523741 total rows in this data file, and there are 356879 unique patients. 
 
@@ -138,7 +140,8 @@ zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $6}' |sort |uniq
 ``` 
 Print the number of unique values of `admission_type`
 ```{bash}
-zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $6}' |sort |uniq | awk 'END {print NR}'
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $6}' |sort |uniq|
+awk 'END {print NR}'
 ```
 
 
@@ -148,7 +151,8 @@ zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $7}' |sort |uniq
 ``` 
 Print the number of unique values of `admission_location`
 ```{bash}
-zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $7}' |sort |uniq | awk 'END {print NR}'
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $7}' |sort |uniq | 
+awk 'END {print NR}'
 ```
 
 
@@ -158,7 +162,8 @@ zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $9}' |sort |uniq
 ``` 
 Print the number of unique values of `insurance`
 ```{bash}
-zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $9}' |sort |uniq | awk 'END {print NR}'
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $9}' |sort |uniq | 
+awk 'END {print NR}'
 ```
 Show the possible values of `ethnicity`
 ```{bash}
@@ -166,7 +171,8 @@ zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $12}' |sort |uni
 ``` 
 Print the number of unique values of `admission_type`
 ```{bash}
-zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $12}' |sort |uniq | awk 'END {print NR}'
+zcat /mnt/mimiciv/1.0/core/admissions.csv.gz |  awk -F, '{print $12}' |sort |
+uniq | awk 'END {print NR}'
 ```
 ## Q4. Who's popular in Price and Prejudice
 
