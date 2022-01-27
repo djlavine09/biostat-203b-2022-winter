@@ -114,6 +114,7 @@ system(
 
 1. Import `admissions.csv.gz` as a tibble `admissions_tble`.
 
+
 2. Let's only keep the admissions that have a match in `icustays_tble` according to `subject_id` and `hadmi_id`.
 
 3. Summarize the following variables by graphics. 
@@ -124,6 +125,41 @@ system(
 - admission week day  
 - admission hour (anything unusual?)  
 
+
+**Solution: **
+```{r}
+admissions_table <- read_csv(str_c(mimic_path, "/core/admissions.csv.gz"))
+```
+
+```{r}
+match <- inner_join(admissions_table, icustays_tble, by = c("subject_id", "hadm_id"))
+```
+
+
+```{r}
+#Admissions by year
+ggplot(data = match, aes(x= year(match$admittime)))+ geom_bar() +
+  ggtitle("Summary of Admissions by Year") + xlab("Year") + theme_minimal()
+
+#Admissions by month
+ggplot(data = match, aes(x= month(match$admittime, label=TRUE)))+ geom_bar() +
+  ggtitle( "Summary of Admissions by Month")+xlab("Month") + theme_minimal()
+
+#Admissions by day of the month
+ggplot(data = match, aes(x= mday(match$admittime))) + geom_bar() +
+  ggtitle("Summary of Admissions by Day of the Month") + 
+  xlab("Day of the Month")+theme_minimal()
+
+#Admissions by day of the week
+ggplot(data = match, aes(x= wday(match$admittime, label=T))) + geom_bar() +
+  ggtitle("Summary of Admissions by Day of the Week") + xlab("Day of the Week") + 
+  theme_minimal()
+
+#Admissions by hour
+ggplot(data = match, aes(x= hour(match$admittime))) + geom_bar() +
+  ggtitle("Summary of Admissions by Hour of the Day") + xlab("Hour") + 
+  theme_minimal()
+```
 ## Q4. `patients` data
 
 Patient information is available in `patients.csv.gz`. See <https://mimic.mit.edu/docs/iv/modules/core/patients/> for details of each field in this file. The first 10 lines are
