@@ -451,6 +451,25 @@ ggplot(data = match, aes(x= hour(match$admittime))) + geom_bar() +
 <li><p>Import <code>patients.csv.gz</code> (<a href="https://mimic.mit.edu/docs/iv/modules/core/patients/" class="uri">https://mimic.mit.edu/docs/iv/modules/core/patients/</a>) as a tibble <code>patients_tble</code> and only keep the patients who have a match in <code>icustays_tble</code> (according to <code>subject_id</code>).</p></li>
 <li><p>Summarize variables <code>gender</code> and <code>anchor_age</code>, and explain any patterns you see.</p></li>
 </ol>
+<pre class="r"><code>icustays_tble &lt;- read_csv(str_c(mimic_path, &quot;/core/patients.csv.gz&quot;))</code></pre>
+<pre><code>## Rows: 382278 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (2): gender, anchor_year_group
+## dbl  (3): subject_id, anchor_age, anchor_year
+## date (1): dod</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>icustays_tble %&gt;% summarise(n_male = sum(gender==&quot;M&quot;), 
+                            n_female = sum(gender ==&quot;F&quot;), 
+                            avg_anchor_age = mean(anchor_age), 
+                            avg_M_age = mean(anchor_age[gender == &quot;M&quot;]),
+                            avg_F_age = mean(anchor_age[gender == &quot;F&quot;]))</code></pre>
+<pre><code>## # A tibble: 1 × 5
+##   n_male n_female avg_anchor_age avg_M_age avg_F_age
+##    &lt;int&gt;    &lt;int&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 182571   199707           40.9      40.8      41.1</code></pre>
 </div>
 <div id="q5.-lab-results" class="section level2">
 <h2>Q5. Lab results</h2>
@@ -458,21 +477,21 @@ ggplot(data = match, aes(x= hour(match$admittime))) + geom_bar() +
 <pre class="r"><code>system(
   str_c(
     &quot;zcat &lt; &quot;, 
-    shQuote(str_c(mimic_path, &quot;/hosp/labevents.csv.gz&quot;)), 
+    shQuote(str_c(mimic_path, &quot;/hosp/labevents_filtered_itemid.csv.gz&quot;)), 
     &quot; | head&quot;
     ), 
   intern = TRUE
 )</code></pre>
-<pre><code>##  [1] &quot;labevent_id,subject_id,hadm_id,specimen_id,itemid,charttime,storetime,value,valuenum,valueuom,ref_range_lower,ref_range_upper,flag,priority,comments&quot;
-##  [2] &quot;670,10000048,,6448755,51484,2126-11-22 19:20:00,2126-11-22 20:07:00,150,150,mg/dL,,,,STAT,&quot;                                                          
-##  [3] &quot;673,10000048,,6448755,51491,2126-11-22 19:20:00,2126-11-22 20:07:00,6.5,6.5,units,5,8,,STAT,&quot;                                                        
-##  [4] &quot;675,10000048,,6448755,51498,2126-11-22 19:20:00,2126-11-22 20:07:00,1.029,1.029, ,1.001,1.035,,STAT,&quot;                                                
-##  [5] &quot;683,10000048,,82729055,50861,2126-11-22 20:45:00,2126-11-23 00:55:00,39,39,IU/L,0,40,,STAT,&quot;                                                         
-##  [6] &quot;684,10000048,,82729055,50862,2126-11-22 20:45:00,2126-11-23 00:55:00,4.7,4.7,g/dL,3.4,4.8,,STAT,&quot;                                                    
-##  [7] &quot;685,10000048,,82729055,50863,2126-11-22 20:45:00,2126-11-23 00:55:00,45,45,IU/L,39,117,,STAT,&quot;                                                       
-##  [8] &quot;686,10000048,,82729055,50868,2126-11-22 20:45:00,2126-11-22 21:32:00,13,13,mEq/L,8,20,,STAT,&quot;                                                        
-##  [9] &quot;687,10000048,,82729055,50878,2126-11-22 20:45:00,2126-11-23 00:55:00,28,28,IU/L,0,40,,STAT,&quot;                                                         
-## [10] &quot;688,10000048,,82729055,50882,2126-11-22 20:45:00,2126-11-22 21:32:00,26,26,mEq/L,22,32,,STAT,&quot;</code></pre>
+<pre><code>##  [1] &quot;subject_id,itemid,charttime,valuenum&quot;   
+##  [2] &quot;10000048,50882,2126-11-22 20:45:00,26&quot;  
+##  [3] &quot;10000048,50902,2126-11-22 20:45:00,106&quot; 
+##  [4] &quot;10000048,50912,2126-11-22 20:45:00,0.7&quot; 
+##  [5] &quot;10000048,50931,2126-11-22 20:45:00,95&quot;  
+##  [6] &quot;10000048,50971,2126-11-22 20:45:00,4&quot;   
+##  [7] &quot;10000048,50983,2126-11-22 20:45:00,141&quot; 
+##  [8] &quot;10000048,51221,2126-11-22 20:45:00,38.2&quot;
+##  [9] &quot;10000048,51301,2126-11-22 20:45:00,9.6&quot; 
+## [10] &quot;10000473,50882,2138-03-15 22:37:00,25&quot;</code></pre>
 <p><code>d_labitems.csv.gz</code> is the dictionary of lab measurements.</p>
 <pre class="r"><code>system(
   str_c(
@@ -499,6 +518,59 @@ ggplot(data = match, aes(x= hour(match$admittime))) + geom_bar() +
 <li><p>Further restrict <code>labevents_tble</code> to the first lab measurement during the ICU stay.</p></li>
 <li><p>Summarize the lab measurements by appropriate numerics and graphics.</p></li>
 </ol>
+<p><strong>Solution: </strong> Part 1:</p>
+<pre class="r"><code>lab_events_tble &lt;- read_csv(str_c(
+  mimic_path, &quot;/hosp/labevents_filtered_itemid.csv.gz&quot;))</code></pre>
+<pre><code>## Rows: 30198826 Columns: 4</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## dbl  (3): subject_id, itemid, valuenum
+## dttm (1): charttime</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>num_rows &lt;- dim(lab_events_tble)[1]; num_rows</code></pre>
+<pre><code>## [1] 30198826</code></pre>
+<pre class="r"><code>head(lab_events_tble)</code></pre>
+<pre><code>## # A tibble: 6 × 4
+##   subject_id itemid charttime           valuenum
+##        &lt;dbl&gt;  &lt;dbl&gt; &lt;dttm&gt;                 &lt;dbl&gt;
+## 1   10000048  50882 2126-11-22 20:45:00     26  
+## 2   10000048  50902 2126-11-22 20:45:00    106  
+## 3   10000048  50912 2126-11-22 20:45:00      0.7
+## 4   10000048  50931 2126-11-22 20:45:00     95  
+## 5   10000048  50971 2126-11-22 20:45:00      4  
+## 6   10000048  50983 2126-11-22 20:45:00    141</code></pre>
+<p>Part 2:</p>
+<pre class="r"><code>labevents_tble &lt;- lab_events_tble %&gt;% filter(itemid == 50912 || itemid ==50971
+                                             || itemid == 50983 
+                                             || itemid == 50902 
+                                             || itemid == 50882 
+                                             || itemid == 51221
+                                             || itemid == 51301 
+                                             || itemid == 50931
+                                             || itemid == 50960 
+                                             || itemid == 50893)</code></pre>
+<pre class="r"><code>unique(labevents_tble$itemid)</code></pre>
+<pre><code>##  [1] 50882 50902 50912 50931 50971 50983 51221 51301 50893 50960</code></pre>
+<p>Part 3:<br />
+<strong>Fix this part </strong></p>
+<pre class="r"><code>labevents_tble %&gt;%  group_by(subject_id) %&gt;% slice_min(n = 1, order_by = as.numeric(charttime))</code></pre>
+<pre><code>## # A tibble: 1,867,412 × 4
+## # Groups:   subject_id [273,581]
+##    subject_id itemid charttime           valuenum
+##         &lt;dbl&gt;  &lt;dbl&gt; &lt;dttm&gt;                 &lt;dbl&gt;
+##  1   10000019  51221 2129-05-21 21:10:00     52.6
+##  2   10000019  51301 2129-05-21 21:10:00     20.3
+##  3   10000032  50882 2180-03-23 11:51:00     27  
+##  4   10000032  50893 2180-03-23 11:51:00      8.4
+##  5   10000032  50902 2180-03-23 11:51:00    101  
+##  6   10000032  50912 2180-03-23 11:51:00      0.4
+##  7   10000032  51301 2180-03-23 11:51:00      3  
+##  8   10000032  50960 2180-03-23 11:51:00      1.8
+##  9   10000032  50971 2180-03-23 11:51:00      3.7
+## 10   10000032  50983 2180-03-23 11:51:00    136  
+## # … with 1,867,402 more rows</code></pre>
 </div>
 <div id="q6.-vitals-from-charted-events" class="section level2">
 <h2>Q6. Vitals from charted events</h2>

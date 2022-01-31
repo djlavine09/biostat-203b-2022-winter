@@ -176,7 +176,23 @@ system(
 
 1. Import `patients.csv.gz` (<https://mimic.mit.edu/docs/iv/modules/core/patients/>) as a tibble `patients_tble` and only keep the patients who have a match in `icustays_tble` (according to `subject_id`).
 
+
+
 2. Summarize variables `gender` and `anchor_age`, and explain any patterns you see.
+
+
+```{r}
+icustays_tble <- read_csv(str_c(mimic_path, "/core/patients.csv.gz"))
+```
+
+```{r}
+icustays_tble %>% summarise(n_male = sum(gender=="M"), 
+                            n_female = sum(gender =="F"), 
+                            avg_anchor_age = mean(anchor_age), 
+                            avg_M_age = mean(anchor_age[gender == "M"]),
+                            avg_F_age = mean(anchor_age[gender == "F"]))
+```
+
 
 ## Q5. Lab results
 
@@ -185,7 +201,7 @@ system(
 system(
   str_c(
     "zcat < ", 
-    shQuote(str_c(mimic_path, "/hosp/labevents.csv.gz")), 
+    shQuote(str_c(mimic_path, "/hosp/labevents_filtered_itemid.csv.gz")), 
     " | head"
     ), 
   intern = TRUE
@@ -212,6 +228,42 @@ system(
 3. Further restrict `labevents_tble` to the first lab measurement during the ICU stay. 
 4. Summarize the lab measurements by appropriate numerics and graphics. 
 
+
+**Solution: **
+Part 1:
+```{r}
+lab_events_tble <- read_csv(str_c(
+  mimic_path, "/hosp/labevents_filtered_itemid.csv.gz"))
+```
+
+```{r}
+num_rows <- dim(lab_events_tble)[1]; num_rows
+```
+```{r}
+head(lab_events_tble)
+```
+
+Part 2: 
+```{r}
+labevents_tble <- lab_events_tble %>% filter(itemid == 50912 || itemid ==50971
+                                             || itemid == 50983 
+                                             || itemid == 50902 
+                                             || itemid == 50882 
+                                             || itemid == 51221
+                                             || itemid == 51301 
+                                             || itemid == 50931
+                                             || itemid == 50960 
+                                             || itemid == 50893)
+```
+```{r}
+unique(labevents_tble$itemid)
+```
+
+Part 3:  
+**Fix this part **
+```{r}
+labevents_tble %>%  group_by(subject_id) %>% slice_min(n = 1, order_by = as.numeric(charttime))
+```
 ## Q6. Vitals from charted events
 
 `chartevents.csv.gz` (<https://mimic.mit.edu/docs/iv/modules/icu/chartevents/>) contains all the charted data available for a patient. During their ICU stay, the primary repository of a patient’s information is their electronic chart. The `itemid` variable indicates a single measurement type in the database. The `value` variable is the value measured for `itemid`. The first 10 lines of `chartevents.csv.gz` are
