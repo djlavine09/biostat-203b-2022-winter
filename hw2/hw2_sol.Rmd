@@ -271,7 +271,7 @@ labevents_tble %>%  group_by(subject_id) %>% slice_min(n = 1, order_by = as.nume
 system(
   str_c(
     "zcat < ", 
-    shQuote(str_c(mimic_path, "/icu/chartevents.csv.gz")), 
+    shQuote(str_c(mimic_path, "/icu/chartevents_filtered_itemid.csv.gz")), 
     " | head"), 
   intern = TRUE
 )
@@ -289,9 +289,40 @@ system(
 
 1. We are interested in the vitals for ICU patients: heart rate (220045), mean non-invasive blood pressure (220181), systolic non-invasive blood pressure (220179), body temperature in Fahrenheit (223761), and respiratory rate (220210). Retrieve a subset of `chartevents.csv.gz` only containing these items for the patients in `icustays_tble` as a tibble `chartevents_tble`.
 
+```{r}
+chartevents_tble <- read_csv(str_c(mimic_path, "/icu/chartevents_filtered_itemid.csv.gz")) %>% 
+  filter(itemid == 220045 || itemid == 220181 || itemid == 220179 
+  || itemid == 223761 
+  || itemid == 220210)
+```
+```{r}
+dim(chartevents_tble)
+```
+
 2. Further restrict `chartevents_tble` to the first vital measurement during the ICU stay. 
 
+```{r}
+chartevents_tble <- chartevents_tble %>% group_by(subject_id) %>% 
+  slice_min(n = 1, order_by = as.numeric(charttime))
+```
+
+
+```{r}
+head(chartevents_tble)
+```
+
 3. Summarize these vital measurements by appropriate numerics and graphics. 
+
+
+```{r}
+#table with summary stats
+chartevents_tble %>% group_by(itemid) %>% 
+  summarise(mean = mean(valuenum), sd = sd(valuenum), min = min(valuenum), 
+            max = max(valuenum)) 
+
+```
+
+
 
 ## Q7. Putting things together
 

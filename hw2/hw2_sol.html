@@ -578,20 +578,20 @@ ggplot(data = match, aes(x= hour(match$admittime))) + geom_bar() +
 <pre class="r"><code>system(
   str_c(
     &quot;zcat &lt; &quot;, 
-    shQuote(str_c(mimic_path, &quot;/icu/chartevents.csv.gz&quot;)), 
+    shQuote(str_c(mimic_path, &quot;/icu/chartevents_filtered_itemid.csv.gz&quot;)), 
     &quot; | head&quot;), 
   intern = TRUE
 )</code></pre>
-<pre><code>##  [1] &quot;subject_id,hadm_id,stay_id,charttime,storetime,itemid,value,valuenum,valueuom,warning&quot;
-##  [2] &quot;10003700,28623837,30600691,2165-04-24 05:10:00,2165-04-24 05:11:00,228236,0,0,,0&quot;     
-##  [3] &quot;10003700,28623837,30600691,2165-04-24 05:12:00,2165-04-24 05:14:00,225067,0,0,,0&quot;     
-##  [4] &quot;10003700,28623837,30600691,2165-04-24 05:12:00,2165-04-24 05:14:00,225070,1,1,,0&quot;     
-##  [5] &quot;10003700,28623837,30600691,2165-04-24 05:12:00,2165-04-24 05:14:00,225076,1,1,,0&quot;     
-##  [6] &quot;10003700,28623837,30600691,2165-04-24 05:12:00,2165-04-24 05:14:00,225078,1,1,,0&quot;     
-##  [7] &quot;10003700,28623837,30600691,2165-04-24 05:12:00,2165-04-24 05:14:00,225086,1,1,,0&quot;     
-##  [8] &quot;10003700,28623837,30600691,2165-04-24 05:12:00,2165-04-24 05:14:00,225091,1,1,,0&quot;     
-##  [9] &quot;10003700,28623837,30600691,2165-04-24 05:12:00,2165-04-24 05:14:00,225103,1,1,,0&quot;     
-## [10] &quot;10003700,28623837,30600691,2165-04-24 05:12:00,2165-04-24 05:14:00,225106,1,1,,0&quot;</code></pre>
+<pre><code>##  [1] &quot;subject_id,hadm_id,stay_id,charttime,itemid,valuenum&quot;      
+##  [2] &quot;10003700,28623837,30600691,2165-04-24 05:28:00,220179,152&quot; 
+##  [3] &quot;10003700,28623837,30600691,2165-04-24 05:28:00,220181,110&quot; 
+##  [4] &quot;10003700,28623837,30600691,2165-04-24 05:30:00,220045,65&quot;  
+##  [5] &quot;10003700,28623837,30600691,2165-04-24 05:30:00,220210,14&quot;  
+##  [6] &quot;10003700,28623837,30600691,2165-04-24 05:38:00,223761,97.6&quot;
+##  [7] &quot;10003700,28623837,30600691,2165-04-24 06:00:00,220045,56&quot;  
+##  [8] &quot;10003700,28623837,30600691,2165-04-24 06:00:00,220179,126&quot; 
+##  [9] &quot;10003700,28623837,30600691,2165-04-24 06:00:00,220181,88&quot;  
+## [10] &quot;10003700,28623837,30600691,2165-04-24 06:00:00,220210,14&quot;</code></pre>
 <p><code>d_items.csv.gz</code> (<a href="https://mimic.mit.edu/docs/iv/modules/icu/d_items/" class="uri">https://mimic.mit.edu/docs/iv/modules/icu/d_items/</a>) is the dictionary for the <code>itemid</code> in <code>chartevents.csv.gz</code>.</p>
 <pre class="r"><code>system(
   str_c(
@@ -611,10 +611,53 @@ ggplot(data = match, aes(x= hour(match$admittime))) + geom_bar() +
 ##  [9] &quot;220052,Arterial Blood Pressure mean,ABPm,chartevents,Routine Vital Signs,mmHg,Numeric,,&quot;         
 ## [10] &quot;220056,Arterial Blood Pressure Alarm - Low,ABP Alarm - Low,chartevents,Alarms,mmHg,Numeric,,&quot;</code></pre>
 <ol style="list-style-type: decimal">
-<li><p>We are interested in the vitals for ICU patients: heart rate (220045), mean non-invasive blood pressure (220181), systolic non-invasive blood pressure (220179), body temperature in Fahrenheit (223761), and respiratory rate (220210). Retrieve a subset of <code>chartevents.csv.gz</code> only containing these items for the patients in <code>icustays_tble</code> as a tibble <code>chartevents_tble</code>.</p></li>
-<li><p>Further restrict <code>chartevents_tble</code> to the first vital measurement during the ICU stay.</p></li>
-<li><p>Summarize these vital measurements by appropriate numerics and graphics.</p></li>
+<li>We are interested in the vitals for ICU patients: heart rate (220045), mean non-invasive blood pressure (220181), systolic non-invasive blood pressure (220179), body temperature in Fahrenheit (223761), and respiratory rate (220210). Retrieve a subset of <code>chartevents.csv.gz</code> only containing these items for the patients in <code>icustays_tble</code> as a tibble <code>chartevents_tble</code>.</li>
 </ol>
+<pre class="r"><code>chartevents_tble &lt;- read_csv(str_c(mimic_path, &quot;/icu/chartevents_filtered_itemid.csv.gz&quot;)) %&gt;% 
+  filter(itemid == 220045 || itemid == 220181 || itemid == 220179 
+  || itemid == 223761 
+  || itemid == 220210)</code></pre>
+<pre><code>## Rows: 23679058 Columns: 6</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## dbl  (5): subject_id, hadm_id, stay_id, itemid, valuenum
+## dttm (1): charttime</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>dim(chartevents_tble)</code></pre>
+<pre><code>## [1] 23679058        6</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Further restrict <code>chartevents_tble</code> to the first vital measurement during the ICU stay.</li>
+</ol>
+<pre class="r"><code>chartevents_tble &lt;- chartevents_tble %&gt;% group_by(subject_id) %&gt;% 
+  slice_min(n = 1, order_by = as.numeric(charttime))</code></pre>
+<pre class="r"><code>head(chartevents_tble)</code></pre>
+<pre><code>## # A tibble: 6 × 6
+## # Groups:   subject_id [3]
+##   subject_id  hadm_id  stay_id charttime           itemid valuenum
+##        &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dttm&gt;               &lt;dbl&gt;    &lt;dbl&gt;
+## 1   10000032 29079034 39553978 2180-07-23 14:00:00 223761     98.7
+## 2   10000980 26913865 39765666 2189-06-27 08:54:00 220210     23  
+## 3   10001217 24597018 37067082 2157-11-20 19:19:00 220045     86  
+## 4   10001217 24597018 37067082 2157-11-20 19:19:00 220179    151  
+## 5   10001217 24597018 37067082 2157-11-20 19:19:00 220181    104  
+## 6   10001217 24597018 37067082 2157-11-20 19:19:00 220210     18</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>Summarize these vital measurements by appropriate numerics and graphics.</li>
+</ol>
+<pre class="r"><code>#table with summary stats
+chartevents_tble %&gt;% group_by(itemid) %&gt;% 
+  summarise(mean = mean(valuenum), sd = sd(valuenum), min = min(valuenum), 
+            max = max(valuenum)) </code></pre>
+<pre><code>## # A tibble: 5 × 5
+##   itemid  mean       sd   min      max
+##    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+## 1 220045  87.3    20.1      0     941 
+## 2 220179 138.   1055.       0  116114 
+## 3 220181 359.  30172.       0 3333330 
+## 4 220210  18.8     6.41     0     180 
+## 5 223761  98.0     3.74     0     106.</code></pre>
 </div>
 <div id="q7.-putting-things-together" class="section level2">
 <h2>Q7. Putting things together</h2>
