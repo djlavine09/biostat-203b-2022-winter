@@ -95,7 +95,8 @@ icustays_tble %>% group_by(subject_id) %>% summarise(numstays = length(subject_i
 
 3. 
 ```{r}
-icustays_tble %>% group_by(subject_id) %>% summarise(first_stay = min(ymd_hms(intime)))
+icustays_tble <- icustays_tble %>% group_by(subject_id) %>%
+  slice_min(n = 1, order_by = as.numeric(intime))
 ```
 
 ## Q3. `admission` data
@@ -132,7 +133,7 @@ admissions_table <- read_csv(str_c(mimic_path, "/core/admissions.csv.gz"))
 ```
 
 ```{r}
-match <- inner_join(admissions_table, icustays_tble, by = c("subject_id", "hadm_id"))
+admissions_table <- semi_join(admissions_table, icustays_tble, by = c("subject_id", "hadm_id"))
 ```
 
 
@@ -182,11 +183,12 @@ system(
 
 
 ```{r}
-icustays_tble <- read_csv(str_c(mimic_path, "/core/patients.csv.gz"))
+patients_tble <- read_csv(str_c(mimic_path, "/core/patients.csv.gz")) %>%
+  semi_join(icustays_tble, by = "subject_id")
 ```
 
 ```{r}
-icustays_tble %>% summarise(n_male = sum(gender=="M"), 
+patients_tble %>% summarise(n_male = sum(gender=="M"), 
                             n_female = sum(gender =="F"), 
                             avg_anchor_age = mean(anchor_age), 
                             avg_M_age = mean(anchor_age[gender == "M"]),
@@ -260,9 +262,22 @@ unique(labevents_tble$itemid)
 ```
 
 Part 3:  
-**Fix this part **
 ```{r}
-labevents_tble %>%  group_by(subject_id) %>% slice_min(n = 1, order_by = as.numeric(charttime))
+labevents_tble <- labevents_tble %>%  group_by(subject_id) %>% 
+  slice_min(n = 1, order_by = as.numeric(charttime))
+```
+Part 4: 
+```{r}
+lab_meas <- labevents_tble %>%
+ pivot_wider(names_from = itemid, values_from = valuenum)
+colnames(lab_meas)[3:12] <- c("hematocrit", "wbc_count", "bicarbonate", "calcium", 
+                           "chloride", "creatinine", "magnesium", "potassium",
+                           "sodium", "glucose")
+head(lab_meas)
+```
+
+```{r}
+ggplot(lab_meas, aes(x=hematocrit))+ geom_histogram()
 ```
 ## Q6. Vitals from charted events
 
@@ -295,9 +310,6 @@ chartevents_tble <- read_csv(str_c(mimic_path, "/icu/chartevents_filtered_itemid
   || itemid == 223761 
   || itemid == 220210)
 ```
-```{r}
-dim(chartevents_tble)
-```
 
 2. Further restrict `chartevents_tble` to the first vital measurement during the ICU stay. 
 
@@ -311,15 +323,40 @@ chartevents_tble <- chartevents_tble %>% group_by(subject_id) %>%
 head(chartevents_tble)
 ```
 
+```{r}
+vitals <- chartevents_tble %>% 
+  pivot_wider(names_from = itemid, values_from = valuenum)
+colnames(vitals)[5:9] <- c("temp_far", "resp_rate", "heart_rate", "syst_bp", 
+                           "mean_bp" )
+```
+
+```{r}
+head(vitals)
+```
+
 3. Summarize these vital measurements by appropriate numerics and graphics. 
 
 
 ```{r}
-#table with summary stats
-chartevents_tble %>% group_by(itemid) %>% 
-  summarise(mean = mean(valuenum), sd = sd(valuenum), min = min(valuenum), 
-            max = max(valuenum)) 
+ggplot(vitals, aes(x=resp_rate)) + 
+  geom_histogram()+ggtitle("Distribution of Respiratory Rate")+
+  theme_minimal()
 
+ggplot(vitals, aes(x=heart_rate)) + 
+  geom_histogram()+ggtitle("Distribution of Heart Rate")+
+  theme_minimal()
+
+ggplot(vitals, aes(x=mean_bp)) + 
+  geom_histogram()+ggtitle("Distribution of Mean Blood Pressure")+
+  theme_minimal()
+
+ggplot(vitals, aes(x=syst_bp)) + 
+  geom_histogram()+ggtitle("Distribution of Systolic Blood Pressure")+
+  theme_minimal()
+
+ggplot(vitals, aes(x=temp_far)) + 
+  geom_histogram()+ggtitle("Distribution of Temperature in Fahrenheit")+
+  theme_minimal()
 ```
 
 
@@ -339,6 +376,33 @@ and columns contain at least following variables
 - first vital measurements during ICU stay
 - an indicator variable `thirty_day_mort` whether the patient died within 30 days of hospital admission (30 day mortality)
 
+
+
+```{r}
+head(icustays_tble)
+head(admissions_table)
+head(patients_tble)
+```
+
+```{r}
+#all variables in the three tables
+mimic_icu_cohort <- icustays_tble %>%
+  inner_join(admissions_table, by = c("subject_id", "hadm_id"))  %>% 
+  inner_join(patients_tble, by = "subject_id") %>%
+  filter(anchor_age >= 18) %>%
+  group_by(subject_id) %>%
+  slice_min(n = 1, order_by = as.numeric(intime))
+
+head(mimic_icu_cohort)
+  
+```
+
+```{r}
+#adding first lab measurements
+#mimic_icu_cohort %>%
+#  inner_join(lab_events_tble, by = "subject_id") %>%
+#  pivot_wider(id_cols = subject_id, names_from = itemid, values_from = as.numeric(valuenum))
+```
 ## Q8. Exploratory data analysis (EDA)
 
 Summarize following information using appropriate numerics or graphs.
