@@ -24,6 +24,8 @@ if (str_detect(os, "Linux")) {
 } else if (str_detect(os, "macOS")) {
   mimic_path <- "/Users/huazhou/Documents/Box Sync/MIMIC/mimic-iv-1.0"
 }
+
+
 ```
 
 In this exercise, we use tidyverse (ggpot2, dplyr, etc) to explore the [MIMIC-IV](https://mimic.mit.edu/docs/iv/) data introduced in [homework 1](https://ucla-biostat-203b.github.io/2022winter/hw/hw1/hw1.html) and to build a cohort of ICU stays.
@@ -139,27 +141,28 @@ admissions_table <- semi_join(admissions_table, icustays_tble, by = c("subject_i
 
 ```{r}
 #Admissions by year
-ggplot(data = match, aes(x= year(match$admittime)))+ geom_bar() +
+ggplot(data = admissions_table, aes(x= year(admittime)))+ geom_bar() +
   ggtitle("Summary of Admissions by Year") + xlab("Year") + theme_minimal()
 
 #Admissions by month
-ggplot(data = match, aes(x= month(match$admittime, label=TRUE)))+ geom_bar() +
-  ggtitle( "Summary of Admissions by Month")+xlab("Month") + theme_minimal()
+ggplot(data = admissions_table, aes(x= month(admittime, label=TRUE)))+ geom_bar() +
+  ggtitle( "Summary of Admissions by Month")+xlab("Month") + theme_minimal(); 
 
 #Admissions by day of the month
-ggplot(data = match, aes(x= mday(match$admittime))) + geom_bar() +
+ggplot(data = admissions_table, aes(x= mday(admittime))) + geom_bar() +
   ggtitle("Summary of Admissions by Day of the Month") + 
   xlab("Day of the Month")+theme_minimal()
 
 #Admissions by day of the week
-ggplot(data = match, aes(x= wday(match$admittime, label=T))) + geom_bar() +
+ggplot(data = admissions_table, aes(x= wday(admittime, label=T))) + geom_bar() +
   ggtitle("Summary of Admissions by Day of the Week") + xlab("Day of the Week") + 
   theme_minimal()
 
 #Admissions by hour
-ggplot(data = match, aes(x= hour(match$admittime))) + geom_bar() +
+ggplot(data = admissions_table, aes(x= hour(admittime))) + geom_bar() +
   ggtitle("Summary of Admissions by Hour of the Day") + xlab("Hour") + 
   theme_minimal()
+
 ```
 ## Q4. `patients` data
 
@@ -247,19 +250,11 @@ head(lab_events_tble)
 
 Part 2: 
 ```{r}
-labevents_tble <- lab_events_tble %>% filter(itemid == 50912 || itemid ==50971
-                                             || itemid == 50983 
-                                             || itemid == 50902 
-                                             || itemid == 50882 
-                                             || itemid == 51221
-                                             || itemid == 51301 
-                                             || itemid == 50931
-                                             || itemid == 50960 
-                                             || itemid == 50893)
+labevents_tble <- lab_events_tble %>%
+  filter(itemid %in% c(50912, 50971, 50983, 50902, 50882, 51221, 
+                       51301, 50931, 50960, 50893))
 ```
-```{r}
-unique(labevents_tble$itemid)
-```
+
 
 Part 3:  
 ```{r}
@@ -269,7 +264,7 @@ labevents_tble <- labevents_tble %>%  group_by(subject_id) %>%
 Part 4: 
 ```{r}
 lab_meas <- labevents_tble %>%
- pivot_wider(names_from = itemid, values_from = valuenum)
+ pivot_wider(names_from = itemid, values_from = valuenum, values_fn = {min})
 colnames(lab_meas)[3:12] <- c("hematocrit", "wbc_count", "bicarbonate", "calcium", 
                            "chloride", "creatinine", "magnesium", "potassium",
                            "sodium", "glucose")
@@ -277,7 +272,32 @@ head(lab_meas)
 ```
 
 ```{r}
+labevents_tble %>% group_by(itemid) %>% summarise(mean = mean(valuenum),
+                                                  sd = sd(valuenum), 
+                                                  min = min(valuenum),
+                                                  max = max(valuenum))
+```
+
+```{r}
 ggplot(lab_meas, aes(x=hematocrit))+ geom_histogram()
+
+ggplot(lab_meas, aes(x=wbc_count))+ geom_histogram()
+
+ggplot(lab_meas, aes(x=bicarbonate))+ geom_histogram()
+
+ggplot(lab_meas, aes(x=calcium))+ geom_histogram()
+
+ggplot(lab_meas, aes(x=chloride))+ geom_histogram()
+
+ggplot(lab_meas, aes(x=creatinine))+ geom_histogram()
+
+ggplot(lab_meas, aes(x=magnesium))+ geom_histogram()
+
+ggplot(lab_meas, aes(x=potassium))+ geom_histogram()
+
+ggplot(lab_meas, aes(x=sodium))+ geom_histogram()
+
+ggplot(lab_meas, aes(x=glucose))+ geom_histogram()
 ```
 ## Q6. Vitals from charted events
 
@@ -306,9 +326,7 @@ system(
 
 ```{r}
 chartevents_tble <- read_csv(str_c(mimic_path, "/icu/chartevents_filtered_itemid.csv.gz")) %>% 
-  filter(itemid == 220045 || itemid == 220181 || itemid == 220179 
-  || itemid == 223761 
-  || itemid == 220210)
+  filter(itemid %in% c(220045, 220181, 220179, 223761, 220210))
 ```
 
 2. Further restrict `chartevents_tble` to the first vital measurement during the ICU stay. 
@@ -389,20 +407,32 @@ head(patients_tble)
 mimic_icu_cohort <- icustays_tble %>%
   inner_join(admissions_table, by = c("subject_id", "hadm_id"))  %>% 
   inner_join(patients_tble, by = "subject_id") %>%
-  filter(anchor_age >= 18) %>%
-  group_by(subject_id) %>%
-  slice_min(n = 1, order_by = as.numeric(intime))
+  filter(anchor_age >= 18) 
+
 
 head(mimic_icu_cohort)
   
 ```
+```{r}
+head(lab_meas)
+head(vitals)
+```
 
 ```{r}
 #adding first lab measurements
-#mimic_icu_cohort %>%
-#  inner_join(lab_events_tble, by = "subject_id") %>%
-#  pivot_wider(id_cols = subject_id, names_from = itemid, values_from = as.numeric(valuenum))
+mimic_icu_cohort <- mimic_icu_cohort %>%
+  inner_join(lab_meas, by = "subject_id") %>%
+  inner_join(vitals, by = "subject_id")
+
+head(mimic_icu_cohort)
 ```
+```{r}
+#adding the 30-day mortality column 
+mimic_icu_cohort$thirty_day_mort <- 
+  as.numeric((mimic_icu_cohort$deathtime - mimic_icu_cohort$admittime) <= 30)
+```
+
+
 ## Q8. Exploratory data analysis (EDA)
 
 Summarize following information using appropriate numerics or graphs.
@@ -414,3 +444,38 @@ Summarize following information using appropriate numerics or graphs.
 - `thirty_day_mort` vs first vital measurements
 
 - `thirty_day_mort` vs first ICU unit
+
+
+```{r}
+mimic_icu_cohort %>% 
+  group_by(ethnicity) %>% 
+  summarise(numdeaths = sum(na.omit(thirty_day_mort)))
+
+#ggplot(mimic_icu_cohort, aes(ethnicity, thirty_day_mort)) + geom_bar()
+```
+```{r}
+mimic_icu_cohort %>% 
+  group_by(language) %>% 
+  summarise(numdeaths = sum(na.omit(thirty_day_mort)))
+```
+
+```{r}
+mimic_icu_cohort %>% 
+  group_by(insurance) %>%
+  summarise(numdeaths = sum(na.omit(thirty_day_mort)))
+```
+```{r}
+mimic_icu_cohort %>%
+  group_by(marital_status) %>%
+  summarise(numdeaths = sum(na.omit(thirty_day_mort)))
+```
+```{r}
+mimic_icu_cohort %>%
+  group_by(gender) %>%
+  summarise(numdeaths = sum(na.omit(thirty_day_mort)))
+```
+```{r}
+mimic_icu_cohort %>%
+  group_by(anchor_age) %>%
+  summarise(numdeaths = sum(na.omit(thirty_day_mort)))
+```
