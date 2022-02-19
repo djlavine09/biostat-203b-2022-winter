@@ -63,6 +63,8 @@ dbListTables(con)
 ```
 
 3. Connect to the `icustays` table.
+
+
 ```{r}
 # full ICU stays table
 icustays_tble <- tbl(con, "icustays") %>%
@@ -83,14 +85,19 @@ icustays_tble <- icustays_tble %>%
 
 4. Connect to the `admissions` table and only keep the patients who have a match in `icustays_tble` (according to `subject_id` and `hadm_id`).
 ```{r}
-# # TODO
-# admissions_tble <- 
+
+knitr::opts_chunk$set(connection = "con")
+
+admissions <- tbl(con, "admissions") %>% 
+  inner_join(icustays_tble, by= c("subject_id", "hadm_id"))
+
 ```
 
 5. Connect to the `patients` table and only keep the patients who have a match in `icustays_tble` (according to `subject_id`).
 ```{r}
-# # TODO
-# patients_tble <-
+
+patients_tble <- tbl(con, "patients") %>%
+  inner_join(icustays_tble, by = "subject_id")
 ```
 
 6. Connect to the `labevents` table and retrieve a subset that only contain subjects who appear in `icustays_tble` and the lab items listed in HW2. 
