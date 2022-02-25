@@ -343,18 +343,33 @@ icustays_tble &lt;- tbl(con, &quot;icustays&quot;) %&gt;%
 <li>Connect to the <code>admissions</code> table and only keep the patients who have a match in <code>icustays_tble</code> (according to <code>subject_id</code> and <code>hadm_id</code>).</li>
 </ol>
 <pre class="r"><code>admissions &lt;- tbl(con, &quot;admissions&quot;) %&gt;% 
-  left_join(icustays_tble, by= c(&quot;subject_id&quot;, &quot;hadm_id&quot;)) 
-admissions %&gt;% summarise(n = n())</code></pre>
-<pre><code>## # Source:   lazy query [?? x 1]
-## # Database: BigQueryConnection
-##        n
-##    &lt;int&gt;
-## 1 523740</code></pre>
+  inner_join(icustays_tble, by= c(&quot;subject_id&quot;, &quot;hadm_id&quot;)) %&gt;%
+  select(subject_id, hadm_id, admittime, dischtime, deathtime, admission_type, 
+         admission_location, discharge_location, insurance, language, 
+         marital_status, ethnicity ,edregtime, edouttime,
+         hospital_expire_flag) </code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li>Connect to the <code>patients</code> table and only keep the patients who have a match in <code>icustays_tble</code> (according to <code>subject_id</code>).</li>
 </ol>
 <pre class="r"><code>patients_tble &lt;- tbl(con, &quot;patients&quot;) %&gt;%
-  left_join(icustays_tble, by = &quot;subject_id&quot;)</code></pre>
+  inner_join(icustays_tble, by = &quot;subject_id&quot;) %&gt;% 
+  select(subject_id, gender, anchor_age, anchor_year, anchor_year_group, dod) %&gt;%
+  print(width = Inf)</code></pre>
+<pre><code>## # Source:   lazy query [?? x 6]
+## # Database: BigQueryConnection
+##    subject_id gender anchor_age anchor_year anchor_year_group dod   
+##         &lt;int&gt; &lt;chr&gt;       &lt;int&gt;       &lt;int&gt; &lt;chr&gt;             &lt;date&gt;
+##  1   19137716 F              18        2111 2008 - 2010       NA    
+##  2   19077387 F              18        2112 2017 - 2019       NA    
+##  3   11155072 M              18        2113 2011 - 2013       NA    
+##  4   17945455 F              18        2113 2014 - 2016       NA    
+##  5   17689255 F              18        2113 2017 - 2019       NA    
+##  6   10894885 F              18        2114 2008 - 2010       NA    
+##  7   15175657 M              18        2114 2014 - 2016       NA    
+##  8   17600374 F              18        2118 2014 - 2016       NA    
+##  9   16501289 M              18        2118 2017 - 2019       NA    
+## 10   10141487 F              18        2119 2017 - 2019       NA    
+## # … with more rows</code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li>Connect to the <code>labevents</code> table and retrieve a subset that only contain subjects who appear in <code>icustays_tble</code> and the lab items listed in HW2.</li>
 </ol>
@@ -380,50 +395,87 @@ head(labevents_tble)</code></pre>
   group_by(subject_id) %&gt;% 
   summarise_all(min) %&gt;%
   left_join(labevents_tble, by = c(&quot;subject_id&quot;, &quot;charttime&quot;))%&gt;%
+  select(subject_id, hadm_id, itemid, valuenum) %&gt;%
   pivot_wider(names_from = itemid, values_from = valuenum, 
               names_prefix = &quot;_&quot;) %&gt;%
   print(width = Inf)</code></pre>
-<pre><code>## # Source:   lazy query [?? x 13]
+<pre><code>## # Source:   lazy query [?? x 12]
 ## # Database: BigQueryConnection
-##    subject_id charttime            hadm_id `_50931` `_50983` `_50971` `_51301`
-##         &lt;int&gt; &lt;dttm&gt;                 &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-##  1   10190130 2159-06-06 15:25:00 21522061      152      145      5       11.1
-##  2   11238238 2177-10-10 06:13:00 24692156      119      140      4.7      7.6
-##  3   12054137 2157-04-23 09:07:00 25630944      159      141      5.9      3.9
-##  4   14296060 2118-02-19 18:11:00 27449908       NA       NA     NA       10.8
-##  5   10144145 2115-01-03 04:11:00 29668384      340      133      4.3      5.9
-##  6   11323975 2129-05-30 21:43:00 20694436       NA       NA     NA       NA  
-##  7   12123995 2116-02-23 02:17:00 28981688       69      133      4.1     18.8
-##  8   14928370 2160-12-24 23:30:00 22332321      148      135      4.4     16.9
-##  9   16045669 2117-12-20 11:32:00 24229672       NA       NA      3.7     NA  
-## 10   19376091 2163-07-26 04:02:00 25331856      124      142      4.1     13  
-##    `_50912` `_50902` `_50893` `_50960` `_51221` `_50882`
-##       &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-##  1      0.9      113      8.7      2.6     37.9       25
-##  2      1        114      7.9      1.9     34         20
-##  3      0.6       97      7.7      1.2     51.6       29
-##  4     NA         NA     NA       NA       26.7       NA
-##  5      0.8       87      9.1      2.4     30.3       30
-##  6     NA         NA     NA        1.7     NA         NA
-##  7      2.2       99      7.6      1.9     28.7       17
-##  8      0.3      101     NA       NA       34.5       29
-##  9      1.6       NA     NA        1.7     37.5       NA
-## 10      1.2      114      6.9      2.5     34.7       17
+##    subject_id  hadm_id `_50931` `_50983` `_50971` `_51301` `_50912` `_50902`
+##         &lt;int&gt;    &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+##  1   10476871 25203436      119      133      3.8      8.1      0.7       99
+##  2   11725345 21592243       NA       NA     NA       NA       NA         NA
+##  3   12327673 25231391      137      137      5.3      8.9      0.4      110
+##  4   12537266 27845175      113      136      4.4     18.7      0.4      102
+##  5   14755447 21231460      417      135      4.8      7.2      0.8      100
+##  6   15056833 21483472      147      139      4.3      5        0.9      105
+##  7   15797232 23989397       99      131      4.7     15.7      0.9       95
+##  8   10464570 20496202       92      138      2.9      7.2      0.6       98
+##  9   10864650 25070229       NA       NA     NA        8.9     NA         NA
+## 10   13181475 21547765      107      141      4.2      6.4      0.7      104
+##    `_50893` `_50960` `_51221` `_50882`
+##       &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+##  1      8.5      1.8     38.5       26
+##  2     NA       NA       34.8       NA
+##  3      8.5      1.7     33.6       16
+##  4      8.4      1.5     29.2       19
+##  5      9.6      1.8     37         26
+##  6      9.7      1.8     43.7       25
+##  7      8.6      2       40.9       25
+##  8      6.7      1.9     35.4       25
+##  9     NA       NA       42         NA
+## 10      9.5      2.2     31.4       33
 ## # … with more rows</code></pre>
-<pre class="r"><code>labevents_tble %&gt;% summarise(n = n())</code></pre>
+<ol start="7" style="list-style-type: decimal">
+<li>Connect to <code>chartevents</code> table and retrieve a subset that only contain subjects who appear in <code>icustays_tble</code> and the chart events listed in HW2.</li>
+</ol>
+<pre class="r"><code> chartevents_tble &lt;- tbl(con, &quot;chartevents&quot;) %&gt;% 
+  inner_join(icustays_tble , by = c(&quot;subject_id&quot;, &quot;hadm_id&quot;, &quot;stay_id&quot;)) %&gt;%
+  filter(itemid %in% c(220045, 220181, 220179, 223761, 220210)) %&gt;%
+  select(subject_id, hadm_id,  charttime, itemid, valuenum)
+
+head(chartevents_tble)</code></pre>
+<pre><code>## # Source:   lazy query [?? x 5]
+## # Database: BigQueryConnection
+##   subject_id  hadm_id charttime           itemid valuenum
+##        &lt;int&gt;    &lt;int&gt; &lt;dttm&gt;               &lt;int&gt;    &lt;dbl&gt;
+## 1   12848856 20987466 2146-02-07 12:00:00 223761     97.6
+## 2   16282054 25139609 2111-03-09 17:00:00 223761     99.5
+## 3   17773309 26323835 2113-03-24 00:00:00 223761     98.2
+## 4   18999410 27726396 2171-11-24 16:45:00 223761     98  
+## 5   10007818 22987108 2146-07-03 16:00:00 223761     98.4
+## 6   12206478 27511830 2138-05-21 00:00:00 223761     95.8</code></pre>
+<p>Only keep the first chart events during ICU stay and pivot chart events to become variables/columns.</p>
+<pre class="r"><code>chartevents_tble &lt;- chartevents_tble %&gt;% 
+  select(subject_id,  charttime) %&gt;% 
+  group_by(subject_id) %&gt;% 
+  summarise_all(min) %&gt;%
+  left_join(chartevents_tble, by = c(&quot;subject_id&quot;, &quot;charttime&quot;))%&gt;%
+  select(subject_id, hadm_id, itemid, valuenum) %&gt;%
+  pivot_wider(names_from = itemid, values_from = valuenum, 
+              names_prefix = &quot;_&quot;) %&gt;%
+  print(width = Inf)</code></pre>
+<pre><code>## # Source:   lazy query [?? x 7]
+## # Database: BigQueryConnection
+##    subject_id  hadm_id `_223761` `_220179` `_220181` `_220210` `_220045`
+##         &lt;int&gt;    &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+##  1   16810657 26679624      NA          NA        NA        NA        92
+##  2   17632211 25000826      NA          NA        NA        13        NA
+##  3   19696560 22726354      98.6        NA        NA        12        60
+##  4   16328100 26542935      NA         103        69        NA        NA
+##  5   17217644 24552414      NA         123        95        10        67
+##  6   13719737 22508570      NA          NA        NA        21       116
+##  7   16051431 28331643      NA          78        57        NA        NA
+##  8   16572145 21635344      NA          NA        NA        13        98
+##  9   18677455 22803122      NA          NA        NA        37       116
+## 10   14614500 22064194     103.         NA        NA        28       106
+## # … with more rows</code></pre>
+<pre class="r"><code>chartevents_tble %&gt;% summarise(n = n())</code></pre>
 <pre><code>## # Source:   lazy query [?? x 1]
 ## # Database: BigQueryConnection
 ##       n
 ##   &lt;int&gt;
-## 1 52545</code></pre>
-<ol start="7" style="list-style-type: decimal">
-<li>Connect to <code>chartevents</code> table and retrieve a subset that only contain subjects who appear in <code>icustays_tble</code> and the chart events listed in HW2.</li>
-</ol>
-<pre class="r"><code># # TODO
-# chartevents_tble &lt;- </code></pre>
-<p>Only keep the first chart events during ICU stay and pivot chart events to become variables/columns.</p>
-<pre class="r"><code># # TODO
-# chartevents_tble &lt;- chartevents_tble %&gt;% ...</code></pre>
+## 1 53136</code></pre>
 <ol start="8" style="list-style-type: decimal">
 <li>Put things together. This step is similar to Q7 of HW2. Using one chain of pipes <code>%&gt;%</code> to perform following data wrangling steps: (i) start with the <code>icustays_tble</code> for the first ICU stay of each unique patient, (ii) merge in admissions and patients tables, (iii) keep adults only (age at admission &gt;= 18), (iv) merge in the labevents and chartevents tables, (v) create an indicator for 30-day mortality, (vi) save the final tibble to an <code>icu_cohort.rds</code> R data file in the <code>mimiciv_shiny</code> folder.</li>
 </ol>
@@ -431,8 +483,142 @@ head(labevents_tble)</code></pre>
 if (!dir.exists(&quot;mimiciv_shiny&quot;)) {
   dir.create(&quot;mimiciv_shiny&quot;)
 }</code></pre>
-<pre class="r"><code># # TODO
-# icu_cohort &lt;- icustays_tble %&gt;% ...</code></pre>
+<pre class="r"><code>icu_cohort &lt;- icustays_tble %&gt;% 
+  inner_join(admissions, by = c(&quot;subject_id&quot;, &quot;hadm_id&quot;)) %&gt;%
+  inner_join(patients_tble, by = &quot;subject_id&quot;) %&gt;%
+  filter(anchor_age &gt;= 18) %&gt;%
+  inner_join(labevents_tble, by = c(&quot;subject_id&quot;, &quot;hadm_id&quot;)) %&gt;%
+  inner_join(chartevents_tble, by = c(&quot;subject_id&quot;, &quot;hadm_id&quot;)) %&gt;%
+  print(width = Inf)</code></pre>
+<pre><code>## # Source:   lazy query [?? x 41]
+## # Database: BigQueryConnection
+##    subject_id intime               hadm_id  stay_id
+##         &lt;int&gt; &lt;dttm&gt;                 &lt;int&gt;    &lt;int&gt;
+##  1   10734403 2110-06-20 22:27:00 26588273 36647759
+##  2   12341414 2126-11-12 19:46:09 23270661 34792777
+##  3   11517868 2110-09-02 13:19:01 20943825 37499438
+##  4   16427415 2152-11-02 16:41:42 23450547 37704589
+##  5   13197526 2111-03-01 02:24:01 28853425 39915969
+##  6   18329324 2139-06-13 20:02:05 24947486 38717050
+##  7   14755447 2172-04-03 14:15:44 21231460 36062702
+##  8   10171525 2115-12-03 22:54:00 21263495 34714152
+##  9   19352034 2114-04-18 02:02:38 21509557 30058866
+## 10   15509304 2189-08-09 05:08:38 26869731 31108607
+##    first_careunit                                  
+##    &lt;chr&gt;                                           
+##  1 Medical Intensive Care Unit (MICU)              
+##  2 Medical Intensive Care Unit (MICU)              
+##  3 Surgical Intensive Care Unit (SICU)             
+##  4 Medical/Surgical Intensive Care Unit (MICU/SICU)
+##  5 Coronary Care Unit (CCU)                        
+##  6 Medical Intensive Care Unit (MICU)              
+##  7 Cardiac Vascular Intensive Care Unit (CVICU)    
+##  8 Medical/Surgical Intensive Care Unit (MICU/SICU)
+##  9 Coronary Care Unit (CCU)                        
+## 10 Medical/Surgical Intensive Care Unit (MICU/SICU)
+##    last_careunit                                    outtime                los
+##    &lt;chr&gt;                                            &lt;dttm&gt;               &lt;dbl&gt;
+##  1 Medical Intensive Care Unit (MICU)               2110-06-24 20:37:21  3.92 
+##  2 Medical Intensive Care Unit (MICU)               2126-11-15 17:18:07  2.90 
+##  3 Surgical Intensive Care Unit (SICU)              2110-09-03 01:45:57  0.519
+##  4 Medical/Surgical Intensive Care Unit (MICU/SICU) 2152-11-05 18:35:54  3.08 
+##  5 Coronary Care Unit (CCU)                         2111-03-02 18:16:23  1.66 
+##  6 Medical Intensive Care Unit (MICU)               2139-06-14 20:08:47  1.00 
+##  7 Cardiac Vascular Intensive Care Unit (CVICU)     2172-04-04 16:54:37  1.11 
+##  8 Medical/Surgical Intensive Care Unit (MICU/SICU) 2115-12-05 00:51:09  1.08 
+##  9 Coronary Care Unit (CCU)                         2114-04-30 21:41:14 12.8  
+## 10 Medical Intensive Care Unit (MICU)               2189-08-10 11:44:52  1.28 
+##    admittime           dischtime           deathtime           admission_type
+##    &lt;dttm&gt;              &lt;dttm&gt;              &lt;dttm&gt;              &lt;chr&gt;         
+##  1 2110-06-20 14:45:00 2110-06-24 18:15:00 2110-06-24 18:15:00 URGENT        
+##  2 2126-11-12 19:45:00 2126-12-08 18:00:00 NA                  URGENT        
+##  3 2110-08-31 19:44:00 2110-09-04 17:20:00 NA                  URGENT        
+##  4 2152-11-02 14:00:00 2152-11-09 17:45:00 NA                  URGENT        
+##  5 2111-03-01 02:22:00 2111-03-03 17:30:00 NA                  URGENT        
+##  6 2139-06-13 20:01:00 2139-06-14 17:45:00 2139-06-14 17:45:00 URGENT        
+##  7 2172-04-02 14:27:00 2172-04-07 15:45:00 NA                  URGENT        
+##  8 2115-12-03 21:07:00 2115-12-13 17:30:00 NA                  URGENT        
+##  9 2114-04-18 02:01:00 2114-05-12 16:40:00 NA                  URGENT        
+## 10 2189-08-09 05:07:00 2189-08-11 15:00:00 NA                  URGENT        
+##    admission_location     discharge_location       insurance language
+##    &lt;chr&gt;                  &lt;chr&gt;                    &lt;chr&gt;     &lt;chr&gt;   
+##  1 TRANSFER FROM HOSPITAL &lt;NA&gt;                     Other     ENGLISH 
+##  2 TRANSFER FROM HOSPITAL REHAB                    Other     ?       
+##  3 TRANSFER FROM HOSPITAL HOME                     Medicare  ENGLISH 
+##  4 TRANSFER FROM HOSPITAL REHAB                    Medicare  ENGLISH 
+##  5 TRANSFER FROM HOSPITAL HOME HEALTH CARE         Other     ENGLISH 
+##  6 TRANSFER FROM HOSPITAL DIED                     Other     ENGLISH 
+##  7 TRANSFER FROM HOSPITAL SKILLED NURSING FACILITY Medicare  ?       
+##  8 TRANSFER FROM HOSPITAL PSYCH FACILITY           Medicaid  ENGLISH 
+##  9 TRANSFER FROM HOSPITAL REHAB                    Medicaid  ?       
+## 10 TRANSFER FROM HOSPITAL HOME                     Other     ENGLISH 
+##    marital_status ethnicity        edregtime           edouttime          
+##    &lt;chr&gt;          &lt;chr&gt;            &lt;dttm&gt;              &lt;dttm&gt;             
+##  1 &lt;NA&gt;           UNABLE TO OBTAIN NA                  NA                 
+##  2 &lt;NA&gt;           UNKNOWN          NA                  NA                 
+##  3 &lt;NA&gt;           UNKNOWN          NA                  NA                 
+##  4 &lt;NA&gt;           WHITE            NA                  NA                 
+##  5 &lt;NA&gt;           WHITE            NA                  NA                 
+##  6 &lt;NA&gt;           UNKNOWN          NA                  NA                 
+##  7 &lt;NA&gt;           UNKNOWN          NA                  NA                 
+##  8 &lt;NA&gt;           UNKNOWN          2115-12-03 20:05:00 2115-12-03 22:54:00
+##  9 &lt;NA&gt;           UNKNOWN          NA                  NA                 
+## 10 &lt;NA&gt;           UNKNOWN          2189-08-09 03:51:00 2189-08-09 06:38:00
+##    hospital_expire_flag gender anchor_age anchor_year anchor_year_group
+##                   &lt;int&gt; &lt;chr&gt;       &lt;int&gt;       &lt;int&gt; &lt;chr&gt;            
+##  1                    1 M              79        2110 2008 - 2010      
+##  2                    0 M              45        2126 2011 - 2013      
+##  3                    0 M              58        2110 2017 - 2019      
+##  4                    0 F              60        2152 2017 - 2019      
+##  5                    0 M              74        2111 2017 - 2019      
+##  6                    1 F              52        2139 2014 - 2016      
+##  7                    0 F              68        2172 2014 - 2016      
+##  8                    0 F              27        2115 2014 - 2016      
+##  9                    0 M              64        2114 2017 - 2019      
+## 10                    0 F              33        2189 2017 - 2019      
+##    dod        `_50931` `_50983` `_50971` `_51301` `_50912` `_50902` `_50893`
+##    &lt;date&gt;        &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+##  1 2110-06-24      196      141      4.6     38.6      1        102      8.1
+##  2 NA              163      125      5        3.8      3         97      8  
+##  3 NA              116      143      4.2     13.7      0.7       97      8.9
+##  4 NA              100      140      3.7     16.2      0.3      100      7.9
+##  5 NA               98      140      4        5.9      0.9      107      8.8
+##  6 2139-06-14       88      142      3.3     13.3      1        106      8.3
+##  7 NA              417      135      4.8      7.2      0.8      100      9.6
+##  8 NA              158      140      3.7     22.9      0.8      108      7.4
+##  9 NA              143      141      4.3      9.7      1.3      108      8.1
+## 10 NA              170      140      4.5     15.9      0.7      107      8.6
+##    `_50960` `_51221` `_50882` `_223761` `_220179` `_220181` `_220210` `_220045`
+##       &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+##  1      2.1     38.8       32      NA          90        66        24       128
+##  2      1.7     32.5       17      NA          NA        NA        19        78
+##  3      2.2     26.9       30      98.2        NA        NA        NA        NA
+##  4      2       27.6       30      NA          NA        NA        17       118
+##  5      1.9     29.1       20      NA          NA        NA        20        69
+##  6      2.7     30.7       24      98.9        NA        NA         4       110
+##  7      1.8     37         26      NA          NA        NA        17        60
+##  8      1.6     32.9       15      98.1        NA        NA        NA        NA
+##  9      1.6     37.2       22      NA          NA        NA        NA        72
+## 10      1.9     35.6       20      NA          NA        NA        18       104
+## # … with more rows</code></pre>
+<pre class="r"><code>head(icu_cohort)</code></pre>
+<pre><code>## # Source:   lazy query [?? x 41]
+## # Database: BigQueryConnection
+##   subject_id intime               hadm_id  stay_id first_careunit  last_careunit
+##        &lt;int&gt; &lt;dttm&gt;                 &lt;int&gt;    &lt;int&gt; &lt;chr&gt;           &lt;chr&gt;        
+## 1   10734403 2110-06-20 22:27:00 26588273 36647759 Medical Intens… Medical Inte…
+## 2   12341414 2126-11-12 19:46:09 23270661 34792777 Medical Intens… Medical Inte…
+## 3   11517868 2110-09-02 13:19:01 20943825 37499438 Surgical Inten… Surgical Int…
+## 4   16427415 2152-11-02 16:41:42 23450547 37704589 Medical/Surgic… Medical/Surg…
+## 5   13197526 2111-03-01 02:24:01 28853425 39915969 Coronary Care … Coronary Car…
+## 6   18329324 2139-06-13 20:02:05 24947486 38717050 Medical Intens… Medical Inte…
+## # … with 35 more variables: outtime &lt;dttm&gt;, los &lt;dbl&gt;, admittime &lt;dttm&gt;,
+## #   dischtime &lt;dttm&gt;, deathtime &lt;dttm&gt;, admission_type &lt;chr&gt;,
+## #   admission_location &lt;chr&gt;, discharge_location &lt;chr&gt;, insurance &lt;chr&gt;,
+## #   language &lt;chr&gt;, marital_status &lt;chr&gt;, ethnicity &lt;chr&gt;, edregtime &lt;dttm&gt;,
+## #   edouttime &lt;dttm&gt;, hospital_expire_flag &lt;int&gt;, gender &lt;chr&gt;,
+## #   anchor_age &lt;int&gt;, anchor_year &lt;int&gt;, anchor_year_group &lt;chr&gt;, dod &lt;date&gt;,
+## #   _50931 &lt;dbl&gt;, _50983 &lt;dbl&gt;, _50971 &lt;dbl&gt;, _51301 &lt;dbl&gt;, _50912 &lt;dbl&gt;, …</code></pre>
 <p>Close database connection and clear workspace.</p>
 <pre class="r"><code>dbDisconnect(con)
 rm(list = ls())</code></pre>
