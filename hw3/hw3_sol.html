@@ -253,7 +253,7 @@ con</code></pre>
 <li>Connect to the <code>icustays</code> table.</li>
 </ol>
 <pre class="r"><code># full ICU stays table
-icustays_tble &lt;- tbl(con, &quot;icustays&quot;) %&gt;%
+icustays_tble &lt;- tbl(con, &quot;icustays&quot;) %&gt;% 
   show_query() %&gt;%
   print(width = Inf)</code></pre>
 <pre><code>## &lt;SQL&gt;
@@ -333,26 +333,89 @@ icustays_tble &lt;- tbl(con, &quot;icustays&quot;) %&gt;%
 ##  9 Neuro Stepdown 2175-11-21 16:06:17 1.63 
 ## 10 Neuro Stepdown 2140-07-19 13:01:05 7.80 
 ## # … with more rows</code></pre>
+<pre class="r"><code>icustays_tble %&gt;% summarise(n = n())</code></pre>
+<pre><code>## # Source:   lazy query [?? x 1]
+## # Database: BigQueryConnection
+##       n
+##   &lt;int&gt;
+## 1 53150</code></pre>
 <ol start="4" style="list-style-type: decimal">
 <li>Connect to the <code>admissions</code> table and only keep the patients who have a match in <code>icustays_tble</code> (according to <code>subject_id</code> and <code>hadm_id</code>).</li>
 </ol>
-<pre class="r"><code>knitr::opts_chunk$set(connection = &quot;con&quot;)
-
-admissions &lt;- tbl(con, &quot;admissions&quot;) %&gt;% 
-  inner_join(icustays_tble, by= c(&quot;subject_id&quot;, &quot;hadm_id&quot;))</code></pre>
+<pre class="r"><code>admissions &lt;- tbl(con, &quot;admissions&quot;) %&gt;% 
+  left_join(icustays_tble, by= c(&quot;subject_id&quot;, &quot;hadm_id&quot;)) 
+admissions %&gt;% summarise(n = n())</code></pre>
+<pre><code>## # Source:   lazy query [?? x 1]
+## # Database: BigQueryConnection
+##        n
+##    &lt;int&gt;
+## 1 523740</code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li>Connect to the <code>patients</code> table and only keep the patients who have a match in <code>icustays_tble</code> (according to <code>subject_id</code>).</li>
 </ol>
 <pre class="r"><code>patients_tble &lt;- tbl(con, &quot;patients&quot;) %&gt;%
-  inner_join(icustays_tble, by = &quot;subject_id&quot;)</code></pre>
+  left_join(icustays_tble, by = &quot;subject_id&quot;)</code></pre>
 <ol start="6" style="list-style-type: decimal">
 <li>Connect to the <code>labevents</code> table and retrieve a subset that only contain subjects who appear in <code>icustays_tble</code> and the lab items listed in HW2.</li>
 </ol>
-<pre class="r"><code># # TODO
-# labevents_tble &lt;- </code></pre>
+<pre class="r"><code>labevents_tble &lt;- tbl(con, &quot;labevents&quot;) %&gt;% 
+  inner_join(icustays_tble , by = c(&quot;subject_id&quot;, &quot;hadm_id&quot;)) %&gt;%
+  filter(itemid %in% c(50912, 50971, 50983, 50902, 50882, 51221, 
+                       51301, 50931, 50960, 50893)) %&gt;%
+  select(subject_id, hadm_id, itemid, valuenum, charttime)
+head(labevents_tble)</code></pre>
+<pre><code>## # Source:   lazy query [?? x 5]
+## # Database: BigQueryConnection
+##   subject_id  hadm_id itemid valuenum charttime          
+##        &lt;int&gt;    &lt;int&gt;  &lt;int&gt;    &lt;dbl&gt; &lt;dttm&gt;             
+## 1   10007677 27180483  51221     29.2 2120-12-01 08:35:00
+## 2   10007677 27180483  50882     26   2120-12-04 08:11:00
+## 3   10038933 25129047  50882     28   2148-09-23 06:05:00
+## 4   10043122 25076224  51221     24.7 2167-09-16 01:45:00
+## 5   10071435 23745288  50882     28   2179-10-31 05:20:00
+## 6   10098875 28517292  51221     21.9 2113-11-19 05:12:00</code></pre>
 <p>Only keep the first lab measurements during ICU stay and pivot lab items to become variables/columns.</p>
-<pre class="r"><code># # TODO
-# labevents_tble &lt;- labevents_tble %&gt;% ...</code></pre>
+<pre class="r"><code>labevents_tble &lt;- labevents_tble %&gt;% 
+  select(subject_id,  charttime) %&gt;% 
+  group_by(subject_id) %&gt;% 
+  summarise_all(min) %&gt;%
+  left_join(labevents_tble, by = c(&quot;subject_id&quot;, &quot;charttime&quot;))%&gt;%
+  pivot_wider(names_from = itemid, values_from = valuenum, 
+              names_prefix = &quot;_&quot;) %&gt;%
+  print(width = Inf)</code></pre>
+<pre><code>## # Source:   lazy query [?? x 13]
+## # Database: BigQueryConnection
+##    subject_id charttime            hadm_id `_50931` `_50983` `_50971` `_51301`
+##         &lt;int&gt; &lt;dttm&gt;                 &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+##  1   10190130 2159-06-06 15:25:00 21522061      152      145      5       11.1
+##  2   11238238 2177-10-10 06:13:00 24692156      119      140      4.7      7.6
+##  3   12054137 2157-04-23 09:07:00 25630944      159      141      5.9      3.9
+##  4   14296060 2118-02-19 18:11:00 27449908       NA       NA     NA       10.8
+##  5   10144145 2115-01-03 04:11:00 29668384      340      133      4.3      5.9
+##  6   11323975 2129-05-30 21:43:00 20694436       NA       NA     NA       NA  
+##  7   12123995 2116-02-23 02:17:00 28981688       69      133      4.1     18.8
+##  8   14928370 2160-12-24 23:30:00 22332321      148      135      4.4     16.9
+##  9   16045669 2117-12-20 11:32:00 24229672       NA       NA      3.7     NA  
+## 10   19376091 2163-07-26 04:02:00 25331856      124      142      4.1     13  
+##    `_50912` `_50902` `_50893` `_50960` `_51221` `_50882`
+##       &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+##  1      0.9      113      8.7      2.6     37.9       25
+##  2      1        114      7.9      1.9     34         20
+##  3      0.6       97      7.7      1.2     51.6       29
+##  4     NA         NA     NA       NA       26.7       NA
+##  5      0.8       87      9.1      2.4     30.3       30
+##  6     NA         NA     NA        1.7     NA         NA
+##  7      2.2       99      7.6      1.9     28.7       17
+##  8      0.3      101     NA       NA       34.5       29
+##  9      1.6       NA     NA        1.7     37.5       NA
+## 10      1.2      114      6.9      2.5     34.7       17
+## # … with more rows</code></pre>
+<pre class="r"><code>labevents_tble %&gt;% summarise(n = n())</code></pre>
+<pre><code>## # Source:   lazy query [?? x 1]
+## # Database: BigQueryConnection
+##       n
+##   &lt;int&gt;
+## 1 52545</code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>Connect to <code>chartevents</code> table and retrieve a subset that only contain subjects who appear in <code>icustays_tble</code> and the chart events listed in HW2.</li>
 </ol>
