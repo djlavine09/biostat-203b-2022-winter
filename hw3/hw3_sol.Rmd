@@ -175,8 +175,12 @@ icu_cohort <- icustays_tble %>%
   filter(anchor_age >= 18) %>%
   inner_join(labevents_tble, by = c("subject_id", "hadm_id")) %>%
   inner_join(chartevents_tble, by = c("subject_id", "hadm_id")) %>%
-  translate_sql(diff = date_diff(admittime, dod)) %>%
-  print(width = Inf)
+  mutate(admit_date = DATE(admittime)) %>%
+  mutate(time_to_death = DATE_DIFF(dod, admit_date, DAY)) %>%
+  mutate(thirty_day_mort = if_else(time_to_death <= 30, 1, 0)) %>%
+  print(width = Inf) %>%
+  collect() %>%
+  write_rds("icu_cohort.rds")
 ```
 
 
@@ -184,15 +188,6 @@ icu_cohort <- icustays_tble %>%
 
 
 
-```{r}
-icu_cohort 
-```
-
-
-
-```{r}
-head(icu_cohort)
-```
 
 Close database connection and clear workspace.
 ```{r, eval=F}
