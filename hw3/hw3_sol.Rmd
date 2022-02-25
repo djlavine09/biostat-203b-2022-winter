@@ -102,7 +102,8 @@ admissions <- tbl(con, "admissions") %>%
 
 patients_tble <- tbl(con, "patients") %>%
   inner_join(icustays_tble, by = "subject_id") %>% 
-  select(subject_id, gender, anchor_age, anchor_year, anchor_year_group, dod) %>%
+  select(subject_id, gender, anchor_age, anchor_year, 
+         anchor_year_group, dod) %>%
   print(width = Inf)
 
 ```
@@ -167,13 +168,24 @@ if (!dir.exists("mimiciv_shiny")) {
 ```
 
 ```{r}
+
 icu_cohort <- icustays_tble %>% 
   inner_join(admissions, by = c("subject_id", "hadm_id")) %>%
   inner_join(patients_tble, by = "subject_id") %>%
   filter(anchor_age >= 18) %>%
   inner_join(labevents_tble, by = c("subject_id", "hadm_id")) %>%
   inner_join(chartevents_tble, by = c("subject_id", "hadm_id")) %>%
+  translate_sql(diff = date_diff(admittime, dod)) %>%
   print(width = Inf)
+```
+
+
+
+
+
+
+```{r}
+icu_cohort 
 ```
 
 
