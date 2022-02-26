@@ -32,8 +32,8 @@ ui <- fluidPage(
   #Main panel for displaying outputs
   mainPanel(
     #Output: Plot of selected variable (histogram)
-    plotOutput("labeventsPlot"),
-    tableOutput("LabTable")
+    plotOutput("labeventsPlot")
+    
   )), 
   
   sidebarLayout(
@@ -83,8 +83,6 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   
-  
- 
   #Create histogram for lab measurements
 output$labeventsPlot <- renderPlot({
   data_in <- switch(input$varlab, 
@@ -100,27 +98,37 @@ output$labeventsPlot <- renderPlot({
  
   #hist(data_in, col = 'darkgray', border = 'white')
   if (input$dead == FALSE & input$outlier == FALSE){
-  ggplot(data = icu, aes(x = data_in)) + geom_histogram() + theme_minimal()+
-    ggtitle(paste("Distribution of", input$varlab))+xlab(input$varlab)}
+  ggplot(data = icu, aes(x = data_in)) + 
+      geom_histogram(color = "mediumpurple2", fill = "mediumpurple2") + 
+      theme_minimal() +
+    ggtitle(paste("Distribution of", input$varlab)) + xlab(input$varlab)}
   else if (input$dead== TRUE & input$outlier == FALSE) {
-    ggplot(data = icu, aes(x = data_in)) + geom_histogram() + theme_minimal()+
-      ggtitle(paste("Distribution of", input$varlab))+xlab(input$varlab) +
+    ggplot(data = icu, aes(x = data_in)) + 
+      geom_histogram(color = "mediumpurple2", fill = "mediumpurple2") + 
+      theme_minimal() +
+      ggtitle(paste("Distribution of", input$varlab)) + xlab(input$varlab) +
       facet_grid(. ~ thirty_day_mort_lab)}
   else if (input$dead== FALSE & input$outlier == TRUE) {
-    ggplot(data = icu, aes(x = data_in)) + geom_histogram() + theme_minimal()+
-      ggtitle(paste("Distribution of", input$varlab))+xlab(input$varlab) +
+    ggplot(data = icu, aes(x = data_in)) + 
+      geom_histogram(color = "mediumpurple2", fill = "mediumpurple2") + 
+      theme_minimal() +
+      ggtitle(paste("Distribution of", input$varlab)) + xlab(input$varlab) +
       xlim(c(
-        (summary(data_in)[2]-1.5*(summary(data_in)[5]-summary(data_in)[2])),
-        (summary(data_in)[5]+1.5*(summary(data_in)[5]-summary(data_in)[2]))))}
-  else {ggplot(data = icu, aes(x = data_in)) + geom_histogram() + 
-      theme_minimal()+
-      ggtitle(paste("Distribution of", input$varlab))+xlab(input$varlab) +
+        (summary(data_in)[2]-1.5*(summary(data_in)[5] - summary(data_in)[2])),
+        (summary(data_in)[5]+1.5*(summary(data_in)[5] - summary(data_in)[2]))))}
+  else {ggplot(data = icu, aes(x = data_in)) + 
+      geom_histogram(color = "mediumpurple2", fill = "mediumpurple2") + 
+      theme_minimal() +
+      ggtitle(paste("Distribution of", input$varlab)) + xlab(input$varlab) +
       xlim(c(
-        (summary(data_in)[2]-1.5*(summary(data_in)[5]-summary(data_in)[2])), 
-        (summary(data_in)[5]+1.5*(summary(data_in)[5]-summary(data_in)[2])))) +
+        (summary(data_in)[2] - 1.5*(summary(data_in)[5] - 
+                                      summary(data_in)[2])), 
+        (summary(data_in)[5] + 1.5*(summary(data_in)[5] - 
+                                      summary(data_in)[2])))) +
       facet_grid(. ~ thirty_day_mort_lab)}
   })
-  
+
+
 
 output$vitalsPlot <- renderPlot({
   data_vit <- switch(input$varvit, 
@@ -133,25 +141,35 @@ output$vitalsPlot <- renderPlot({
   
 
   if (input$dead2 == FALSE & input$outlier2 == FALSE){
-    ggplot(data = icu, aes(x = data_vit)) + geom_histogram() + theme_minimal()+
-      ggtitle(paste("Distribution of", input$varvit))+xlab(input$varvit)}
+    ggplot(data = icu, aes(x = data_vit)) + 
+      geom_histogram(color = "cornflowerblue", fill = "cornflowerblue") + 
+      theme_minimal() +
+      ggtitle(paste("Distribution of", input$varvit)) + xlab(input$varvit)}
   else if (input$dead2 == TRUE & input$outlier2 == FALSE) {
-    ggplot(data = icu, aes(x = data_vit)) + geom_histogram() + theme_minimal()+
-      ggtitle(paste("Distribution of", input$varvit))+xlab(input$varvit) +
+    ggplot(data = icu, aes(x = data_vit)) + 
+      geom_histogram(color = "cornflowerblue", fill = "cornflowerblue") + 
+      theme_minimal() +
+      ggtitle(paste("Distribution of", input$varvit)) + xlab(input$varvit) +
       facet_grid(. ~ thirty_day_mort_lab)}
   else if (input$dead2 == FALSE & input$outlier2 == TRUE) {
-    ggplot(data = icu, aes(x = data_vit)) + geom_histogram() + theme_minimal()+
-      ggtitle(paste("Distribution of", input$varvit))+xlab(input$varvit) +
+    ggplot(data = icu, aes(x = data_vit)) + 
+      geom_histogram(color = "cornflowerblue", fill = "cornflowerblue") + 
+      theme_minimal() +
+      ggtitle(paste("Distribution of", input$varvit)) + xlab(input$varvit) +
       xlim(c(
-        (summary(data_vit)[2]-1.5*(summary(data_vit)[5]-summary(data_vit)[2])),
-        (summary(data_vit)[5]+1.5*(summary(data_vit)[5]-
+        (summary(data_vit)[2] - 1.5*(summary(data_vit)[5]
+                                     - summary(data_vit)[2])),
+        (summary(data_vit)[5] + 1.5*(summary(data_vit)[5] -
                                      summary(data_vit)[2]))))}
   else {
-    ggplot(data = icu, aes(x = data_vit)) + geom_histogram() + theme_minimal()+
+    ggplot(data = icu, aes(x = data_vit)) + 
+      geom_histogram(color = "cornflowerblue", fill = "cornflowerblue") + 
+      theme_minimal() +
       ggtitle(paste("Distribution of", input$varvit))+xlab(input$varvit) +
       xlim(c(
-        (summary(data_vit)[2]-1.5*(summary(data_vit)[5]-summary(data_vit)[2])),
-        (summary(data_vit)[5]+1.5*(summary(data_vit)[5]-
+        (summary(data_vit)[2]-1.5*(summary(data_vit)[5] - 
+                                     summary(data_vit)[2])),
+        (summary(data_vit)[5]+1.5*(summary(data_vit)[5] -
                                      summary(data_vit)[2])))) +
       facet_grid(. ~ thirty_day_mort_lab)}
 })
@@ -166,10 +184,11 @@ output$demoPlot <- renderPlot({
                      "Marital Status" = icu$marital_status,
                      "Gender" = icu$gender,
                      "Age at Hospital Admission" = icu$anchor_age,
-                     "First ICU Care Unit" - icu$first_careunit)
+                    )
   
-  ggplot(data = icu, aes(x= data_dem, y = icu$thirty_day_mort)) + geom_col() +
-    theme_minimal()+ ggtitle(paste("Distribution of", input$dem)) +
+  ggplot(data = icu, aes(x= data_dem, y = icu$thirty_day_mort)) + 
+    geom_col(color = "lightpink1") +
+    theme_minimal() + ggtitle(paste("Thirty Day Mortality by", input$dem)) +
     xlab(input$dem) + 
     ylab("Count of deaths that occured within 30 days of admission")
   })

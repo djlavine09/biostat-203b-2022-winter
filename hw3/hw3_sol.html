@@ -398,34 +398,34 @@ head(labevents_tble)</code></pre>
   left_join(labevents_tble, by = c(&quot;subject_id&quot;, &quot;charttime&quot;))%&gt;%
   select(subject_id, hadm_id, itemid, valuenum) %&gt;%
   pivot_wider(names_from = itemid, values_from = valuenum, 
-              names_prefix = &quot;_&quot;) %&gt;%
+              names_prefix = &quot;meas_&quot;) %&gt;%
   print(width = Inf)</code></pre>
 <pre><code>## # Source:   lazy query [?? x 12]
 ## # Database: BigQueryConnection
-##    subject_id  hadm_id `_50931` `_50983` `_50971` `_51301` `_50912` `_50902`
-##         &lt;int&gt;    &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-##  1   10476871 25203436      119      133      3.8      8.1      0.7       99
-##  2   11725345 21592243       NA       NA     NA       NA       NA         NA
-##  3   12327673 25231391      137      137      5.3      8.9      0.4      110
-##  4   12537266 27845175      113      136      4.4     18.7      0.4      102
-##  5   14755447 21231460      417      135      4.8      7.2      0.8      100
-##  6   15056833 21483472      147      139      4.3      5        0.9      105
-##  7   15797232 23989397       99      131      4.7     15.7      0.9       95
-##  8   10464570 20496202       92      138      2.9      7.2      0.6       98
-##  9   10864650 25070229       NA       NA     NA        8.9     NA         NA
-## 10   13181475 21547765      107      141      4.2      6.4      0.7      104
-##    `_50893` `_50960` `_51221` `_50882`
-##       &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-##  1      8.5      1.8     38.5       26
-##  2     NA       NA       34.8       NA
-##  3      8.5      1.7     33.6       16
-##  4      8.4      1.5     29.2       19
-##  5      9.6      1.8     37         26
-##  6      9.7      1.8     43.7       25
-##  7      8.6      2       40.9       25
-##  8      6.7      1.9     35.4       25
-##  9     NA       NA       42         NA
-## 10      9.5      2.2     31.4       33
+##    subject_id  hadm_id meas_50931 meas_50983 meas_50971 meas_51301 meas_50912
+##         &lt;int&gt;    &lt;int&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+##  1   10305105 28155156        139        141        4          7.4        0.6
+##  2   11241014 29878566         NA         NA       NA         13         NA  
+##  3   11317564 26299434        229        137        5.9       10.6        1.5
+##  4   12847427 26341594         87        139        4.5        5.9        1.3
+##  5   14353309 20621324         93        140        3.4        5.2        0.8
+##  6   14596582 23533345         81        142        4.9        9          3.1
+##  7   14675473 25096709         99        132        4.8        8.3        1.3
+##  8   17005338 21822950        113        136        3.2       31.3        1.2
+##  9   10590630 24969694        142        131        4.6        7.8        0.7
+## 10   12759077 26658677        182        143        4.3       12.5        0.7
+##    meas_50902 meas_50893 meas_50960 meas_51221 meas_50882
+##         &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+##  1        113        6.9        1.4       29.3         19
+##  2         NA       NA         NA         26.3         NA
+##  3        107        7.9        1.8       37.3         25
+##  4        102       10.2        2.2       40.8         26
+##  5        104        8.8        2.2       34.9         26
+##  6        105       NA         NA         31.2         16
+##  7        100        9          1.9       37.8         20
+##  8        102        8          2.8       32.7         24
+##  9         98        8.6        1.8       30.6         22
+## 10        104        9.4        1.4       36.2         23
 ## # … with more rows</code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>Connect to <code>chartevents</code> table and retrieve a subset that only contain subjects who appear in <code>icustays_tble</code> and the chart events listed in HW2.</li>
@@ -454,22 +454,34 @@ head(chartevents_tble)</code></pre>
   left_join(chartevents_tble, by = c(&quot;subject_id&quot;, &quot;charttime&quot;))%&gt;%
   select(subject_id, hadm_id, itemid, valuenum) %&gt;%
   pivot_wider(names_from = itemid, values_from = valuenum, 
-              names_prefix = &quot;_&quot;) %&gt;%
+              names_prefix = &quot;meas_&quot;) %&gt;%
   print(width = Inf)</code></pre>
 <pre><code>## # Source:   lazy query [?? x 7]
 ## # Database: BigQueryConnection
-##    subject_id  hadm_id `_223761` `_220179` `_220181` `_220210` `_220045`
-##         &lt;int&gt;    &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-##  1   16810657 26679624      NA          NA        NA        NA        92
-##  2   17632211 25000826      NA          NA        NA        13        NA
-##  3   19696560 22726354      98.6        NA        NA        12        60
-##  4   16328100 26542935      NA         103        69        NA        NA
-##  5   17217644 24552414      NA         123        95        10        67
-##  6   13719737 22508570      NA          NA        NA        21       116
-##  7   16051431 28331643      NA          78        57        NA        NA
-##  8   16572145 21635344      NA          NA        NA        13        98
-##  9   18677455 22803122      NA          NA        NA        37       116
-## 10   14614500 22064194     103.         NA        NA        28       106
+##    subject_id  hadm_id meas_223761 meas_220179 meas_220181 meas_220210
+##         &lt;int&gt;    &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+##  1   16629524 28553868        NA            84          45          NA
+##  2   10983169 27733975        NA            NA          NA          27
+##  3   10148417 28291473        97.8         100          65          19
+##  4   12686410 24762560        NA            NA          NA          16
+##  5   13106513 28233798        NA            NA          NA          15
+##  6   17925184 27799845        NA            NA          NA          27
+##  7   17406428 23297176        NA            NA          NA          NA
+##  8   17854218 24758098        NA            NA          NA          22
+##  9   16529350 26615781        NA            NA          NA          26
+## 10   11112487 23059707        NA            NA          NA          16
+##    meas_220045
+##          &lt;dbl&gt;
+##  1          NA
+##  2          84
+##  3          84
+##  4         102
+##  5          70
+##  6         135
+##  7         126
+##  8          75
+##  9          91
+## 10         115
 ## # … with more rows</code></pre>
 <pre class="r"><code>chartevents_tble %&gt;% summarise(n = n())</code></pre>
 <pre><code>## # Source:   lazy query [?? x 1]
@@ -582,42 +594,42 @@ if (!dir.exists(&quot;mimiciv_shiny&quot;)) {
 ##  8                    0 F              27        2115 2014 - 2016      
 ##  9                    0 M              64        2114 2017 - 2019      
 ## 10                    0 F              33        2189 2017 - 2019      
-##    dod        `_50931` `_50983` `_50971` `_51301` `_50912` `_50902` `_50893`
-##    &lt;date&gt;        &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-##  1 2110-06-24      196      141      4.6     38.6      1        102      8.1
-##  2 NA              163      125      5        3.8      3         97      8  
-##  3 NA              116      143      4.2     13.7      0.7       97      8.9
-##  4 NA              100      140      3.7     16.2      0.3      100      7.9
-##  5 NA               98      140      4        5.9      0.9      107      8.8
-##  6 2139-06-14       88      142      3.3     13.3      1        106      8.3
-##  7 NA              417      135      4.8      7.2      0.8      100      9.6
-##  8 NA              158      140      3.7     22.9      0.8      108      7.4
-##  9 NA              143      141      4.3      9.7      1.3      108      8.1
-## 10 NA              170      140      4.5     15.9      0.7      107      8.6
-##    `_50960` `_51221` `_50882` `_223761` `_220179` `_220181` `_220210` `_220045`
-##       &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-##  1      2.1     38.8       32      NA          90        66        24       128
-##  2      1.7     32.5       17      NA          NA        NA        19        78
-##  3      2.2     26.9       30      98.2        NA        NA        NA        NA
-##  4      2       27.6       30      NA          NA        NA        17       118
-##  5      1.9     29.1       20      NA          NA        NA        20        69
-##  6      2.7     30.7       24      98.9        NA        NA         4       110
-##  7      1.8     37         26      NA          NA        NA        17        60
-##  8      1.6     32.9       15      98.1        NA        NA        NA        NA
-##  9      1.6     37.2       22      NA          NA        NA        NA        72
-## 10      1.9     35.6       20      NA          NA        NA        18       104
-##    admit_date time_to_death thirty_day_mort
-##    &lt;date&gt;             &lt;int&gt;           &lt;dbl&gt;
-##  1 2110-06-20             4               1
-##  2 2126-11-12            NA              NA
-##  3 2110-08-31            NA              NA
-##  4 2152-11-02            NA              NA
-##  5 2111-03-01            NA              NA
-##  6 2139-06-13             1               1
-##  7 2172-04-02            NA              NA
-##  8 2115-12-03            NA              NA
-##  9 2114-04-18            NA              NA
-## 10 2189-08-09            NA              NA
+##    dod        meas_50931 meas_50983 meas_50971 meas_51301 meas_50912 meas_50902
+##    &lt;date&gt;          &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+##  1 2110-06-24        196        141        4.6       38.6        1          102
+##  2 NA                163        125        5          3.8        3           97
+##  3 NA                116        143        4.2       13.7        0.7         97
+##  4 NA                100        140        3.7       16.2        0.3        100
+##  5 NA                 98        140        4          5.9        0.9        107
+##  6 2139-06-14         88        142        3.3       13.3        1          106
+##  7 NA                417        135        4.8        7.2        0.8        100
+##  8 NA                158        140        3.7       22.9        0.8        108
+##  9 NA                143        141        4.3        9.7        1.3        108
+## 10 NA                170        140        4.5       15.9        0.7        107
+##    meas_50893 meas_50960 meas_51221 meas_50882 meas_223761 meas_220179
+##         &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+##  1        8.1        2.1       38.8         32        NA            90
+##  2        8          1.7       32.5         17        NA            NA
+##  3        8.9        2.2       26.9         30        98.2          NA
+##  4        7.9        2         27.6         30        NA            NA
+##  5        8.8        1.9       29.1         20        NA            NA
+##  6        8.3        2.7       30.7         24        98.9          NA
+##  7        9.6        1.8       37           26        NA            NA
+##  8        7.4        1.6       32.9         15        98.1          NA
+##  9        8.1        1.6       37.2         22        NA            NA
+## 10        8.6        1.9       35.6         20        NA            NA
+##    meas_220181 meas_220210 meas_220045 admit_date time_to_death thirty_day_mort
+##          &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt; &lt;date&gt;             &lt;int&gt;           &lt;dbl&gt;
+##  1          66          24         128 2110-06-20             4               1
+##  2          NA          19          78 2126-11-12            NA              NA
+##  3          NA          NA          NA 2110-08-31            NA              NA
+##  4          NA          17         118 2152-11-02            NA              NA
+##  5          NA          20          69 2111-03-01            NA              NA
+##  6          NA           4         110 2139-06-13             1               1
+##  7          NA          17          60 2172-04-02            NA              NA
+##  8          NA          NA          NA 2115-12-03            NA              NA
+##  9          NA          NA          72 2114-04-18            NA              NA
+## 10          NA          18         104 2189-08-09            NA              NA
 ## # … with more rows</code></pre>
 <p>Close database connection and clear workspace.</p>
 <pre class="r"><code>dbDisconnect(con)
