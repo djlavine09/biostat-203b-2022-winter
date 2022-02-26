@@ -134,17 +134,7 @@ output$vitalsPlot <- renderPlot({
       facet_grid(. ~ thirty_day_mort_lab)}
 })
 
-output$tablevitals <- renderTable({
-  data_vits <- switch(input$varvit, 
-                     "Heart Rate" = icu$meas_220045, 
-                     "Mean non-invasive blood pressure" = icu$meas_220181, 
-                     "Systolic non-invasive blood pressure" = icu$meas_220179, 
-                     "Body Tempurature in Fahrenheit" = icu$meas_223761, 
-                     "Respiratory Rate" = icu$meas_220210)
 
-  icu %>% summarise(Median = median(data_vits), sd(data_vits), Minimum = min(data_vits), Maximum = max(data_vits))
- 
-})
 
 output$demoPlot <- renderPlot({
   data_dem <- switch(input$dem, 
