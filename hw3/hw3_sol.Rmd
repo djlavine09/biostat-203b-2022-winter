@@ -129,7 +129,7 @@ labevents_tble <- labevents_tble %>%
   left_join(labevents_tble, by = c("subject_id", "charttime"))%>%
   select(subject_id, hadm_id, itemid, valuenum) %>%
   pivot_wider(names_from = itemid, values_from = valuenum, 
-              names_prefix = "_") %>%
+              names_prefix = "meas_") %>%
   print(width = Inf)
 
 ```
@@ -152,7 +152,7 @@ chartevents_tble <- chartevents_tble %>%
   left_join(chartevents_tble, by = c("subject_id", "charttime"))%>%
   select(subject_id, hadm_id, itemid, valuenum) %>%
   pivot_wider(names_from = itemid, values_from = valuenum, 
-              names_prefix = "_") %>%
+              names_prefix = "meas_") %>%
   print(width = Inf)
 
 chartevents_tble %>% summarise(n = n())
