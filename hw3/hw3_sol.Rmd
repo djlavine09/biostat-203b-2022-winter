@@ -91,10 +91,10 @@ icustays_tble %>% summarise(n = n())
 ```{r}
 admissions <- tbl(con, "admissions") %>% 
   inner_join(icustays_tble, by= c("subject_id", "hadm_id")) %>%
-  select(subject_id, hadm_id, admittime, dischtime, deathtime, admission_type, 
-         admission_location, discharge_location, insurance, language, 
-         marital_status, ethnicity ,edregtime, edouttime,
-         hospital_expire_flag) 
+  select(subject_id, hadm_id, admittime, dischtime, deathtime, insurance, language, 
+         marital_status, ethnicity) %>% print(width = Inf)
+
+admissions %>% summarise(n = n())
 ```
 
 5. Connect to the `patients` table and only keep the patients who have a match in `icustays_tble` (according to `subject_id`).
@@ -103,8 +103,10 @@ admissions <- tbl(con, "admissions") %>%
 patients_tble <- tbl(con, "patients") %>%
   inner_join(icustays_tble, by = "subject_id") %>% 
   select(subject_id, gender, anchor_age, anchor_year, 
-         anchor_year_group, dod) %>%
+          dod) %>%
   print(width = Inf)
+
+patients_tble %>% summarise(n = n())
 
 ```
 
@@ -114,8 +116,10 @@ labevents_tble <- tbl(con, "labevents") %>%
   inner_join(icustays_tble , by = c("subject_id", "hadm_id")) %>%
   filter(itemid %in% c(50912, 50971, 50983, 50902, 50882, 51221, 
                        51301, 50931, 50960, 50893)) %>%
-  select(subject_id, hadm_id, itemid, valuenum, charttime)
-head(labevents_tble)
+  select(subject_id, hadm_id, itemid, valuenum, charttime) %>%
+  print(width = Inf)
+
+labevents_tble %>% summarise(n = n())
 ```
 
 
@@ -123,16 +127,20 @@ Only keep the first lab measurements during ICU stay and pivot lab items to beco
 
 ```{r}
 labevents_tble <- labevents_tble %>% 
-  select(subject_id,  charttime) %>% 
-  group_by(subject_id) %>% 
+  select(subject_id, itemid, charttime) %>% 
+  group_by(subject_id, itemid) %>% 
   summarise_all(min) %>%
-  left_join(labevents_tble, by = c("subject_id", "charttime"))%>%
+  ungroup() %>%
+  left_join(labevents_tble, by = c("subject_id","itemid", "charttime"))%>%
   select(subject_id, hadm_id, itemid, valuenum) %>%
   pivot_wider(names_from = itemid, values_from = valuenum, 
               names_prefix = "meas_") %>%
   print(width = Inf)
 
+labevents_tble %>% summarise(n = n())
+
 ```
+
 
 7. Connect to `chartevents` table and retrieve a subset that only contain subjects who appear in `icustays_tble` and the chart events listed in HW2.
 ```{r}
@@ -141,15 +149,16 @@ labevents_tble <- labevents_tble %>%
   filter(itemid %in% c(220045, 220181, 220179, 223761, 220210)) %>%
   select(subject_id, hadm_id,  charttime, itemid, valuenum)
 
-head(chartevents_tble)
+
 ```
 Only keep the first chart events during ICU stay and pivot chart events to become variables/columns.
 ```{r}
 chartevents_tble <- chartevents_tble %>% 
-  select(subject_id,  charttime) %>% 
-  group_by(subject_id) %>% 
+  select(subject_id, itemid, charttime) %>% 
+  group_by(subject_id, itemid) %>% 
   summarise_all(min) %>%
-  left_join(chartevents_tble, by = c("subject_id", "charttime"))%>%
+  ungroup() %>%
+  left_join(chartevents_tble, by = c("subject_id", "itemid", "charttime"))%>%
   select(subject_id, hadm_id, itemid, valuenum) %>%
   pivot_wider(names_from = itemid, values_from = valuenum, 
               names_prefix = "meas_") %>%

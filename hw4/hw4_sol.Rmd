@@ -44,38 +44,10 @@ library(DBI)
 library(bigrquery)
 library(knitr)
 ```
-```{r}
-# path to the service account token 
-if (Sys.info()[["nodename"]] == "biostat-203b-teaching-server") {
-  # on teaching server
-  satoken <- "/mnt/mimiciv/1.0/biostat-203b-2022winter-3fdc2392ac39.json"
-} else {
-  # on my own Mac laptop
-  satoken <- "/Users/huazhou/Documents/github.com/ucla-biostat-203b/2022winter/hw/hw3/biostat-203b-2022winter-3fdc2392ac39.json"
-}
-# BigQuery authentication using service account
-bq_auth(
-  path = satoken,
-  # email = "mimiciv-bigquery@biostat-203b-2022winter.iam.gserviceaccount.com",
-  # scopes = c("https://www.googleapis.com/auth/bigquery",
-  #   "https://www.googleapis.com/auth/cloud-platform")
-)
-```
 
-```{r}
-# Connect to the BigQuery database `biostat-203b-2022winter.mimic4_v1_0_203b`
-con <- dbConnect(
-    bigrquery::bigquery(),
-    project = "biostat-203b-2022winter",
-    dataset = "mimic4_v1_0_203b",
-    billing = "biostat-203b-2022winter"
-)
-con
-```
 
-```{r}
-dbListTables(con)
-```
+
+
 
 
 ## Q1. Missing data
@@ -101,11 +73,14 @@ other values in the dataset. ", 'blue4')`
 
 3. Perform a data quality check of the ICU stays data. Discard variables with substantial missingness, say >5000 `NA`s. Replace apparent data entry errors by `NA`s.
 
-```{r}
-icu <- read_rds("~/biostat-203b-2022-winter/hw3/mimiciv_shiny/icu_cohort.rds") %>%
-  print(width = Inf)
-```
+```{r, results = 'asis'}
+icu <- read_rds("~/biostat-203b-2022-winter/hw3/mimiciv_shiny/icu_cohort.rds") 
 
+#kable(icu)
+```
+```{r}
+icu$thirty_day_mort[is.na(icu$thirty_day_mort)] <- 0
+```
 
 ```{r}
 colSums(is.na(icu))
