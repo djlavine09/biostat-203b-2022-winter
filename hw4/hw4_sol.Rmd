@@ -85,9 +85,49 @@ icu$thirty_day_mort[is.na(icu$thirty_day_mort)] <- 0
 ```{r}
 colSums(is.na(icu))
 ```
+Determine outliers that may be due to missing data/data entry errors. 
+```{r}
+var <- integer()
+low <- numeric()
+high <- numeric()
+outlier <- as.data.frame(cbind(var, low, high))
+n <- 1
+x <- c(20:34)
+for (i in x){
+  q1 <- quantile(icu[,i], .25, na.rm = TRUE)
+  q3 <- quantile(icu[,i], .75, na.rm = TRUE)
+  outlier[n,] <- c(i,  q1 - 1.5 * (q3 - q1), q3 + 1.5 * (q3 - q1))
+  n = n + 1
+}
 
+```
+
+Replace data that is above or below these values with NAs
+
+```{r}
+n <- 1
+for (i in x){
+ r <- which(icu[,i] > outlier[n,3] | icu[,i] < outlier[n,2])
+ icu[r,i] <- NA
+ n <- n +1
+}
+
+```
+
+Now let's examine how many NAs there are
+
+```{r}
+colSums(is.na(icu))
+```
+Remove columns with more than 5000 NAs:
+
+```{r}
+icu <- icu %>% select( which(colSums(is.na(icu)) < 5000))
+```
 
 4. Impute missing values by `miceRanger` (request $m=3$ data sets). This step is computational intensive. Make sure to save the imputation results as a file. Hint: Setting `max.depth=10` in the `miceRanger` function may cut some computing time.
+
+
 
 5. Make imputation diagnostic plots and explain what they mean.
 
