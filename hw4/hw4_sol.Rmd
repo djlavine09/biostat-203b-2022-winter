@@ -76,6 +76,10 @@ other values in the dataset. ", 'blue4')`
 ```{r, results = 'asis'}
 icu <- read_rds("~/biostat-203b-2022-winter/hw3/mimiciv_shiny/icu_cohort.rds") 
 
+<<<<<<< HEAD
+=======
+#kable(icu)
+>>>>>>> 511041b0ca8f8c81a2a9965a12bab9fba5c7f4f8
 ```
 ```{r}
 icu$thirty_day_mort[is.na(icu$thirty_day_mort)] <- 0
@@ -85,7 +89,11 @@ icu$thirty_day_mort[is.na(icu$thirty_day_mort)] <- 0
 colSums(is.na(icu))
 ```
 Determine outliers that may be due to missing data/data entry errors. 
+<<<<<<< HEAD
 ```{r, results = 'asis'}
+=======
+```{r}
+>>>>>>> 511041b0ca8f8c81a2a9965a12bab9fba5c7f4f8
 var <- integer()
 low <- numeric()
 high <- numeric()
@@ -99,7 +107,10 @@ for (i in x){
   n = n + 1
 }
 
+<<<<<<< HEAD
 kable(outlier)
+=======
+>>>>>>> 511041b0ca8f8c81a2a9965a12bab9fba5c7f4f8
 ```
 
 Replace data that is above or below these values with NAs
@@ -127,6 +138,7 @@ icu <- icu %>% select( which(colSums(is.na(icu)) < 5000))
 
 4. Impute missing values by `miceRanger` (request $m=3$ data sets). This step is computational intensive. Make sure to save the imputation results as a file. Hint: Setting `max.depth=10` in the `miceRanger` function may cut some computing time.
 
+<<<<<<< HEAD
 ```{r, eval=FALSE}
 mice <- miceRanger(icu, m = 3, returnModels = FALSE, max.depth = 10)
 ```
@@ -147,6 +159,11 @@ plotModelError(mice_res,vars='allNumeric')
 plotVarImportance(mice_res)
 plotImputationVariance(mice_res, ncol=2, widths=c(5,3))
 ```
+=======
+
+
+5. Make imputation diagnostic plots and explain what they mean.
+>>>>>>> 511041b0ca8f8c81a2a9965a12bab9fba5c7f4f8
 
 6. Choose one of the imputed data sets to be used in Q2. This is **not** a good idea to use just one imputed data set or to average multiple imputed data sets. Explain in a couple of sentences what the correct Multiple Imputation strategy is.
 
