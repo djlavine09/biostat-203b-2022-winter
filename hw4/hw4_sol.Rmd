@@ -44,8 +44,6 @@ Load database libraries and the tidyverse frontend:
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(lubridate))
 suppressPackageStartupMessages(library(miceRanger))
-library(DBI)
-library(bigrquery)
 library(knitr)
 ```
 
@@ -182,14 +180,42 @@ plotImputationVariance(mice_res, ncol=2, widths=c(5,3))
 
 ```{r}
 mice_data <- completeData(mice_res)
+mice_data <- mice_data$Dataset_1
 ```
 
 ## Q2. Predicting 30-day mortality
 
 Develop at least two analytic approaches for predicting the 30-day mortality of patients admitted to ICU using demographic information (gender, age, marital status, ethnicity), first lab measurements during ICU stay, and first vital measurements during ICU stay. For example, you can use (1) logistic regression (`glm()` function in base R or keras), (2) logistic regression with lasso penalty (glmnet or keras package), (3) random forest (randomForest package), or (4) neural network (keras package).
 
-1. Partition data into 80% training set and 20% test set. Stratify partitioning according the 30-day mortality status.
+### 1. Partition data into 80% training set and 20% test set. Stratify partitioning according the 30-day mortality status.
 
-2. Train the models using the training set.
+We will use the package `splitTools` to create a partition of our data into 80% training set and 20% test set. 
+```{r}
+library(splitTools)
+set.seed(3602)
+mice_split <- partition(mice_data$thirty_day_mort,
+                        p = c(train = 0.8, test = 0.2))
+test <- mice_data[mice_split$test, ]
+train <- mice_data[mice_split$train, ]
+```
 
-3. Compare model prediction performance on the test set.
+### 2. Train the models using the training set. {.tabset}
+
+#### Method 1: Logistic regression 
+```{r}
+mice_logistic <- glm(thirty_day_mort ~ gender + anchor_age + marital_status + 
+                       ethnicity +  meas_51221 + meas_50882 + meas_50912 + 
+                       meas_51301 + meas_50902 + meas_50960 + meas_50983 + 
+                       meas_50893 +  meas_50971 + meas_50931 + meas_220210 +
+                       meas_220045 + meas_223761+ meas_220181 + 
+                       meas_220179, data = test, family = binomial)
+```
+
+#### Method 2: Random Forests
+
+
+### 3. Compare model prediction performance on the test set.
+
+#### Method 1: Logistic Regression
+
+#### Method 2: Random Forests
