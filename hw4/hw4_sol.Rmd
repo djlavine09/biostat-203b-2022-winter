@@ -30,7 +30,6 @@ colFmt <- function(x,color) {
   } else {
     ret <- x
   }
-
   return(ret)
 }
 ```
@@ -101,10 +100,7 @@ for (i in x){
   outlier[n,] <- c(i,  q1 - 1.5 * (q3 - q1), q3 + 1.5 * (q3 - q1))
   n = n + 1
 }
-
-
 kable(outlier)
-
 ```
 
 Replace data that is above or below these values with NAs
@@ -116,7 +112,6 @@ for (i in x){
  icu[r,i] <- NA
  n <- n +1
 }
-
 ```
 
 Now let's examine how many NAs there are
@@ -162,7 +157,6 @@ plotVarConvergence(mice_res,vars='allNumeric')
 #### Model OOB Error
 ```{r}
 plotModelError(mice_res,vars='allNumeric')
-
 ```
 
 #### Variable Importance
@@ -183,6 +177,15 @@ mice_data <- completeData(mice_res)
 mice_data <- mice_data$Dataset_1
 ```
 
+Change categorical variables into factors:
+```{r}
+mice_data <- mice_data %>% mutate(marital_status_fact = as.factor(marital_status), 
+                     gender_fact = as.factor(gender), 
+                     ethnicity_fact = as.factor(ethnicity), 
+                     thirty_fact = as.factor(thirty_day_mort))
+```
+
+
 ## Q2. Predicting 30-day mortality
 
 Develop at least two analytic approaches for predicting the 30-day mortality of patients admitted to ICU using demographic information (gender, age, marital status, ethnicity), first lab measurements during ICU stay, and first vital measurements during ICU stay. For example, you can use (1) logistic regression (`glm()` function in base R or keras), (2) logistic regression with lasso penalty (glmnet or keras package), (3) random forest (randomForest package), or (4) neural network (keras package).
@@ -193,29 +196,109 @@ We will use the package `splitTools` to create a partition of our data into 80% 
 ```{r}
 library(splitTools)
 set.seed(3602)
+#only keep necessary predictor and outcome variables
+
 mice_split <- partition(mice_data$thirty_day_mort,
                         p = c(train = 0.8, test = 0.2))
 test <- mice_data[mice_split$test, ]
 train <- mice_data[mice_split$train, ]
 ```
 
+
 ### 2. Train the models using the training set. {.tabset}
 
 #### Method 1: Logistic regression 
+
+Select model using LASSO. Process guided by ISLR Ch 6.6 pages 251 - 255.
 ```{r}
-mice_logistic <- glm(thirty_day_mort ~ gender + anchor_age + marital_status + 
-                       ethnicity +  meas_51221 + meas_50882 + meas_50912 + 
+library(glmnet)
+preds <- model.matrix(thirty_fact~., train[,c(13:16, 18:32,38)])[,-1]
+y <- as.numeric(train$thirty_fact)
+lass <- glmnet(preds, y, alpha = 1)
+
+preds_new <-  model.matrix(thirty_fact~., test[,c(13:16, 18:32,38)])[,-1]
+y_new <- as.numeric(test$thirty_fact)
+
+cv <- cv.glmnet(preds, y, alpha = 1)
+
+x <- model.matrix(thirty_fact~., mice_data[,c(13:16, 18:32,38)])[,-1]
+y <- as.numeric(mice_data$thirty_fact)
+out <- glmnet(x, y,
+              alpha = 1)
+coeff <- predict(out, type = "coefficients", s= cv$lambda.1se)
+coeff[which(round(coeff,3) != 0),]
+```
+
+From the LASSO selection, it appears that an indicator variable for ethnicity unable to obtain, ethnicity unknown, gender, age, and all lab/vital measurements except for meas_50983, meas_50971, meas_50931, and meas_220181
+
+
+
+
+```{r}
+mice_logistic <- glm(thirty_day_mort ~ gender + anchor_age  + 
+                       as.numeric(ethnicity == "UNABLE TO OBTAIN") +
+                       as.numeric(ethnicity == "UNKNOWN")+  meas_51221 +
+                       meas_50882 + meas_50912 + meas_51301 + meas_50902 + 
+                       meas_50960 + meas_220210 + meas_220045 + meas_223761 +  
+                       meas_220179, data = train, family = binomial)
+```
+
+
+#### Method 2: Random Forests
+```{r}
+library(randomForest)
+
+mice_forest <- randomForest(thirty_fact ~ gender_fact + anchor_age + marital_status_fact + 
+                       ethnicity_fact +  meas_51221 + meas_50882 + meas_50912 + 
                        meas_51301 + meas_50902 + meas_50960 + meas_50983 + 
                        meas_50893 +  meas_50971 + meas_50931 + meas_220210 +
                        meas_220045 + meas_223761+ meas_220181 + 
-                       meas_220179, data = test, family = binomial)
+                       meas_220179, data = train)
+  
 ```
 
-#### Method 2: Random Forests
 
 
-### 3. Compare model prediction performance on the test set.
+
+### 3. Compare model prediction performance on the test set. {.tabset}
+
+We will use the AUC of the ROC curve to evaluate predictive performance. The package `pROC` can calculate the AUC and plot the ROC curves. 
+
+```{r, eval = FALSE}
+install.packages("pROC")
+```
+```{r}
+library(pROC)
+```
+
 
 #### Method 1: Logistic Regression
 
+```{r}
+#Predicted values in the test data using logistic regression model.
+yhat_logistic <- predict(mice_logistic, type = "response", newdata = test)
+```
+
+ROC and AUC: 
+```{r}
+roc_logistic <- roc(as.numeric(test$thirty_fact), yhat_logistic)
+
+auc(roc_logistic)
+plot(roc_logistic)
+```
+
 #### Method 2: Random Forests
+```{r}
+yhat_forest <- predict(mice_forest, type = "response", newdata = test)
+
+```
+
+```{r}
+roc_logistic <- roc(as.numeric(test$thirty_fact), as.numeric(yhat_forest))
+
+auc(roc_logistic)
+plot(roc_logistic)
+```
+
+### Remarks
+We see that the AUC for the logistic regression is substantially larger than that of the random forest. That is, the logistic model with variable selection using LASSO regression predicts 30-day mortality better than the random forest. There are a few pros and cons to each method which might explain the difference in performance between the two methods, and also might affect the interpretability and usefullness of the model. 
