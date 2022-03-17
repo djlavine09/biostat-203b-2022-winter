@@ -179,7 +179,7 @@ plotImputationVariance(mice_res, ncol=2, widths=c(5,3))
 
 ### 6. Choose one of the imputed data sets to be used in Q2. This is **not** a good idea to use just one imputed data set or to average multiple imputed data sets. Explain in a couple of sentences what the correct Multiple Imputation strategy is.
 
-
+<span style="color: #0066CC;">The correct method of choosing a data set is described in Ch 5 of Stef van Buuren's book. The process involves creating a one pooled result from the three imputed datasets. This method helps to reduce variance in the estimates and derive more accurate conclusions. </span>
 ```{r}
 mice_data <- completeData(mice_res)
 mice_data <- mice_data$Dataset_1

@@ -512,6 +512,7 @@ for (i in x){
 </div>
 <div id="choose-one-of-the-imputed-data-sets-to-be-used-in-q2.-this-is-not-a-good-idea-to-use-just-one-imputed-data-set-or-to-average-multiple-imputed-data-sets.-explain-in-a-couple-of-sentences-what-the-correct-multiple-imputation-strategy-is." class="section level3">
 <h3>6. Choose one of the imputed data sets to be used in Q2. This is <strong>not</strong> a good idea to use just one imputed data set or to average multiple imputed data sets. Explain in a couple of sentences what the correct Multiple Imputation strategy is.</h3>
+<p><span style="color: #0066CC;">The correct method of choosing a data set is described in Ch 5 of Stef van Buuren’s book. The process involves creating a one pooled result from the three imputed datasets. This method helps to reduce variance in the estimates and derive more accurate conclusions. </span></p>
 <pre class="r"><code>mice_data &lt;- completeData(mice_res)
 mice_data &lt;- mice_data$Dataset_1</code></pre>
 <p>Change categorical variables into factors:</p>
