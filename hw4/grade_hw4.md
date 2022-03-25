@@ -10,7 +10,7 @@
   
 -   Is the final report in a human readable format html? 
 
-    Yes. Very presentable format. Very nice to be able to tabulate between results. Make a neural network tab and you would have gotten A++. `+10`.
+    Yes. Very presentable format. Very nice to be able to tabulate between results. Make a third and fourth tab and you would have gotten A++. `+10`.
   
 -   Is the report prepared as a dynamic document (R markdown) for better reproducibility?
 
