@@ -1,5 +1,6 @@
 library(shiny)
 library(tidyverse)
+
 icu <- read_rds("~/biostat-203b-2022-winter/hw3/mimiciv_shiny/icu_cohort.rds")
 icu$thirty_day_mort_lab <- icu$thirty_day_mort
 icu$thirty_day_mort_lab[is.na(icu$thirty_day_mort_lab)] <- 0
